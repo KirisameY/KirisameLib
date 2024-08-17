@@ -53,7 +53,7 @@ public class I18nRegister<T>(IRegister<T> defaultRegister) : IRegister<T>
         return DefaultRegister.GetItem(id);
     }
 
-    private bool GetItemInLocal(string local, string id, [NotNullWhen(true)] out T? item)
+    private bool GetItemInLocal(string local, string id, [MaybeNullWhen(false)] out T item)
     {
         item = default(T);
         if (!LocalRegisterDict.TryGetValue(local, out var regDict))
