@@ -11,16 +11,16 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<TResult> SelectExist<T, TResult>(this IEnumerable<T> enumerable, Func<T, TResult?> func) =>
-        enumerable.Select(func).OfType<TResult>();
+    public static IEnumerable<TResult> SelectExist<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector) =>
+        source.Select(selector).OfType<TResult>();
 
     //dual
-    public static IEnumerable<(T1, T2)> CrossJoin<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second) =>
+    public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
         CrossJoin(first, second, (x, y) => (x, y));
 
-    public static IEnumerable<TResult> CrossJoin<T1, T2, TResult>
-        (this IEnumerable<T1> first, IEnumerable<T2> second, Func<T1, T2, TResult> func) =>
+    public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>
+        (this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) =>
         from x in first
         from y in second
-        select func(x, y);
+        select resultSelector(x, y);
 }
