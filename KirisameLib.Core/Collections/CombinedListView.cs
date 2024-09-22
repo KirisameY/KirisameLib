@@ -7,12 +7,12 @@ namespace KirisameLib.Core.Collections;
 public class CombinedListView<T>(params IReadOnlyList<T>[] lists) : IReadOnlyList<T>
 {
     [MustDisposeResource]
-    public IEnumerator<T> GetEnumerator() => lists.SelectMany(item => item).GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => lists.SelectMany(list => list).GetEnumerator();
 
     [MustDisposeResource]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public int Count => lists.Select(list => list.Count).Sum();
+    public int Count => lists.Sum(list => list.Count);
 
     public T this[int index]
     {
