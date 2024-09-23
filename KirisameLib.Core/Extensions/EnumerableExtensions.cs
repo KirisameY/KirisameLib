@@ -11,6 +11,19 @@ public static class EnumerableExtensions
         }
     }
 
+    public static int PositionOfFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+    {
+        int order = 0;
+        foreach (var item in source)
+        {
+            if (predicate(item)) return order;
+            order++;
+        }
+        return -1;
+    }
+
+    public static int PositionOfFirst<T>(this IEnumerable<T> source, T target) => PositionOfFirst(source, item => Equals(item, target));
+
     public static IEnumerable<TResult> SelectExist<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector) =>
         source.Select(selector).OfType<TResult>();
 
