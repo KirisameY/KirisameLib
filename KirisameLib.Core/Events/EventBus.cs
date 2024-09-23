@@ -44,13 +44,24 @@ public static class EventBus
         where TEvent : BaseEvent
     {
         var type = typeof(TEvent);
+        List<Exception> exceptions = [];
         for (;;)
         {
-            var handlerContainerType = typeof(HandlerContainer<>).MakeGenericType(type!);
-            var invoke = handlerContainerType.GetMethod(nameof(HandlerContainer<BaseEvent>.InvokeHandler));
-            invoke!.Invoke(null, [@event]);
+            try
+            {
+                var handlerContainerType = typeof(HandlerContainer<>).MakeGenericType(type!);
+                var invoke = handlerContainerType.GetMethod(nameof(HandlerContainer<BaseEvent>.InvokeHandler));
+                invoke!.Invoke(null, [@event]);
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
             if (type == typeof(BaseEvent)) break;
             type = type!.BaseType;
         }
+        if (exceptions.Count > 0) throw new EventHandlingException(exceptions);
     }
+
+    public class EventHandlingException(IEnumerable<Exception> innerExceptions) : AggregateException(innerExceptions);
 }
