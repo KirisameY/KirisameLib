@@ -88,7 +88,7 @@ public abstract class RandomBelt
     public bool NextBool() => NextBool(0.5);
 
     //Collection
-    [Pure] public IEnumerable<T> Shuffle<T>(IEnumerable<T> list) => list.OrderBy(_ => NextUint());
+    [Pure] [LinqTunnel] public IEnumerable<T> Shuffle<T>(IEnumerable<T> list) => list.OrderBy(_ => NextUint());
 
     public void ShuffleInPlace<T>(IList<T> list)
     {
@@ -98,7 +98,7 @@ public abstract class RandomBelt
             list[i] = shuffle[i];
     }
 
-    [Pure] public IEnumerable<T> Draw<T>(IEnumerable<T> enumerable, int count) => Shuffle(enumerable).Take(count);
+    [Pure] [LinqTunnel] public IEnumerable<T> Draw<T>(IEnumerable<T> enumerable, int count) => Shuffle(enumerable).Take(count);
 
-    [Pure] public T? DrawSingle<T>(IEnumerable<T> enumerable) => Shuffle(enumerable).FirstOrDefault();
+    [Pure] public T? Draw<T>(IEnumerable<T> enumerable) => Shuffle(enumerable).FirstOrDefault();
 }
