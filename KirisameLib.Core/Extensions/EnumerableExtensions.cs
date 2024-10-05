@@ -27,6 +27,7 @@ public static class EnumerableExtensions
     public static IEnumerable<TResult> SelectExist<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector) =>
         source.Select(selector).OfType<TResult>();
 
+
     //dual
     public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
         CrossJoin(first, second, (x, y) => (x, y));
@@ -36,4 +37,11 @@ public static class EnumerableExtensions
         from x in first
         from y in second
         select resultSelector(x, y);
+
+
+    //multi
+    public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source) =>
+        source.SelectMany(x => x);
+
+    public static IEnumerable<T> Flatten<T>(params IEnumerable<T>[] source) => source.Flatten();
 }
