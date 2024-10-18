@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Core", "Kirisam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Core.SourceGenerator", "KirisameLib.Core.SourceGenerator\KirisameLib.Core.SourceGenerator.csproj", "{D2E20117-5002-46EF-A770-BB56A5C04812}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Data", "KirisameLib.Data\KirisameLib.Data.csproj", "{DE59AD4B-A5CD-49E4-92A3-E84F45890CE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D2E20117-5002-46EF-A770-BB56A5C04812}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2E20117-5002-46EF-A770-BB56A5C04812}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2E20117-5002-46EF-A770-BB56A5C04812}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE59AD4B-A5CD-49E4-92A3-E84F45890CE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE59AD4B-A5CD-49E4-92A3-E84F45890CE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE59AD4B-A5CD-49E4-92A3-E84F45890CE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE59AD4B-A5CD-49E4-92A3-E84F45890CE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

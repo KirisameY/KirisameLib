@@ -1,6 +1,6 @@
 using KirisameLib.Core.Events;
 
-namespace KirisameLib.Core.I18n;
+namespace KirisameLib.Data.I18n;
 
 public record LocalSettingEvent : BaseEvent;
 

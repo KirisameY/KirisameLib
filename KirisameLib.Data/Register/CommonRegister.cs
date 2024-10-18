@@ -1,6 +1,6 @@
 using KirisameLib.Core.Logging;
 
-namespace KirisameLib.Core.Register;
+namespace KirisameLib.Data.Register;
 
 public class CommonRegister<T>(string registerName, Func<string, T> defaultItemGetter) : IRegister<T>
 {

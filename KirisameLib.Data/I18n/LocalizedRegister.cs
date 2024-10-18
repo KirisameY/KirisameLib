@@ -2,9 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using KirisameLib.Core.Events;
 using KirisameLib.Core.Logging;
-using KirisameLib.Core.Register;
+using KirisameLib.Data.Register;
 
-namespace KirisameLib.Core.I18n;
+namespace KirisameLib.Data.I18n;
 
 public abstract class LocalizedRegister
 {
