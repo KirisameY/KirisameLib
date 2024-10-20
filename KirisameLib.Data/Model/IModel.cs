@@ -8,5 +8,5 @@ public interface IModel<out TTarget>
 
 public interface IModel<in TSource, out TTarget> : IModel<TTarget>
 {
-    static abstract IModel<TTarget>? FromSource(TSource source);
+    static abstract IModel<TTarget>[] FromSource(TSource source, out ModelParseErrorInfo errorMessages);
 }
