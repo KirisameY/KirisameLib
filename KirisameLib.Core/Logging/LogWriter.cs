@@ -69,10 +69,12 @@ public static partial class LogManager
             return logFile;
         }
 
-        public async void Dispose()
+        public void Close()
         {
-            await _cancellationTokenSource.CancelAsync();
-            await _task;
+            _cancellationTokenSource.CancelAsync().Wait();
+            _task.Wait();
         }
+
+        void IDisposable.Dispose() => Close();
     }
 }

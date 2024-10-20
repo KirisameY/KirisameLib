@@ -29,7 +29,7 @@ public static partial class LogManager
 
     public static void Dispose()
     {
-        Writer?.Dispose();
+        Writer?.Close();
     }
 
     //Logging
