@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-
-using KirisameLib.Core.Extensions;
+﻿using KirisameLib.Core.Extensions;
 using KirisameLib.Data.Registration;
 
 namespace KirisameLib.Data.FileLoading;
@@ -11,7 +8,10 @@ public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSourc
 {
     private LinkedList<string> PathLink { get; } = [];
     private Stack<RegisterInfo> RegisterStack { get; } = [];
+    private List<Task> RegisteringTasks { get; } = [];
     private bool Exited { get; set; } = false;
+
+    protected string CurrentPath => RegisterStack.TryPeek(out var info) ? info.Path : "";
 
 
     public sealed override bool EnterDirectory(string dirName)
@@ -22,8 +22,13 @@ public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSourc
         var path = PathLink.Join('/');
         if (PathMapView.TryGetValue(path, out var registrant))
         {
-            RegisterStack.Push(new RegisterInfo(path, registrant, []));
+            RegisterStack.Push(new RegisterInfo(path, registrant, [], []));
         }
+        else if (RegisterStack.TryPeek(out var info))
+        {
+            info.SubPathLink.AddLast(dirName);
+        }
+
         return RegisterStack.Count > 0;
     }
 
@@ -32,7 +37,7 @@ public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSourc
         RootLoaderExitedException.ThrowIf(Exited);
 
         if (!RegisterStack.TryPeek(out var info)) return;
-        HandleFile(info.SourceDict, fileName, fileContent);
+        HandleFile(info.SourceDict, info.SubPathLink.Append(fileName).Join('/'), fileContent);
     }
 
     public sealed override bool ExitDirectory()
@@ -41,34 +46,35 @@ public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSourc
 
         if (PathLink.Count == 0)
         {
+            Task.WhenAll(RegisteringTasks).Wait();
             EndUp();
             Exited = true;
             return true;
         }
+
+        //else: still in root directory
         var path = PathLink.Join('/');
         PathLink.RemoveLast();
-        if (!RegisterStack.TryPeek(out var info) || info.Path != path) return false;
+
+        var info = RegisterStack.Peek();
+        info.SubPathLink.RemoveLast();
+        if (info.Path != path) return false;
+
+        var task = RegisterDirectory(info.Registrant, info.SourceDict);
+        RegisteringTasks.Add(task);
         RegisterStack.Pop();
-        RegisterDirectory(info);
         return false;
     }
 
 
-    protected abstract void HandleFile(Dictionary<string, TSource> sourceDict, string fileName, byte[] fileContent);
-    protected abstract void RegisterDirectory(RegisterInfo info);
+    protected abstract void HandleFile(Dictionary<string, TSource> sourceDict, string fileSubPath, byte[] fileContent);
+    protected abstract Task RegisterDirectory(TRegistrant registrant, Dictionary<string, TSource> sourceDict);
     protected abstract void EndUp();
 
 
-    protected readonly record struct RegisterInfo(string Path, TRegistrant Registrant, Dictionary<string, TSource> SourceDict);
-}
-
-public class RootLoaderExitedException : Exception
-{
-    internal RootLoaderExitedException() { }
-
-    [StackTraceHidden]
-    internal static void ThrowIf([DoesNotReturnIf(true)] bool condition)
-    {
-        if (condition) throw new RootLoaderExitedException();
-    }
+    private readonly record struct RegisterInfo(
+        string Path, TRegistrant Registrant,
+        Dictionary<string, TSource> SourceDict,
+        LinkedList<string> SubPathLink
+    );
 }
