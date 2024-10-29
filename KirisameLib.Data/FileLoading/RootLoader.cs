@@ -19,4 +19,5 @@ public abstract class RootLoader<TSource, TRegistrant> : RootLoader
     private Dictionary<string, TRegistrant> PathMap { get; } = new();
     private ReadOnlyDictionary<string, TRegistrant>? _pathMapView;
     protected ReadOnlyDictionary<string, TRegistrant> PathMapView => _pathMapView ??= PathMap.AsReadOnly();
+    public bool AddRegistrant(string path, TRegistrant registrant) => PathMap.TryAdd(path, registrant);
 }
