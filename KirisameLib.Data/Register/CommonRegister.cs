@@ -48,6 +48,11 @@ public class CommonRegister<T>(string registerName, Func<string, T> defaultItemG
         }
     }
 
+    public bool ItemRegistered(string id)
+    {
+        return RegDict.ContainsKey(id);
+    }
+
     //Logging
     private Logger Logger { get; } = LogManager.GetLogger($"Register.{registerName}");
 

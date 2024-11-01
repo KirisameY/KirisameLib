@@ -31,24 +31,36 @@ public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
 {
     #region Constructors
 
-    private LocalizedRegister(string registerName, Func<LocalizedRegister<T>, string, T> defaultGetter)
+    private LocalizedRegister(string registerName,
+                              Func<LocalizedRegister<T>, string, T> defaultGetter,
+                              Func<LocalizedRegister<T>, string, bool> defaultFinder)
     {
         Name = registerName;
         DefaultGetter = defaultGetter;
+        DefaultFinder = defaultFinder;
         Logger = LogManager.GetLogger($"Register.Localized.{registerName}");
     }
 
-    public LocalizedRegister(string registerName, Func<string, T> defaultGetter) :
-        this(registerName, (_, id) => defaultGetter(id)) { }
+    public LocalizedRegister(string registerName, Func<string, T> defaultGetter, Func<string, bool>? defaultFinder = null) :
+        this(registerName,
+             (_, id) => defaultGetter(id),
+             (_, id) => defaultFinder?.Invoke(id) ?? false) { }
 
     public LocalizedRegister(string registerName, IRegister<T> defaultRegister) :
-        this(registerName, (_, id) => defaultRegister.GetItem(id)) { }
+        this(registerName,
+             (_, id) => defaultRegister.GetItem(id),
+             (_, id) => defaultRegister.ItemRegistered(id)) { }
 
-    public LocalizedRegister(string registerName, string defaultLocal, Func<string, T> defaultGetter) :
-        this(registerName, (@this, id) =>
+    public LocalizedRegister(string registerName, string defaultLocal, Func<string, T> defaultGetter,
+                             Func<string, bool>? defaultFinder = null) :
+        this(registerName,
+             (@this, id) =>
                  @this.GetItemInLocal(defaultLocal, id, out var item)
                      ? item
-                     : defaultGetter(id)) { }
+                     : defaultGetter(id),
+             (@this, id) =>
+                 @this.ItemRegisteredInLocal(defaultLocal, id) || (defaultFinder?.Invoke(id) ?? false)
+            ) { }
 
     #endregion
 
@@ -58,6 +70,7 @@ public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
     public string Name { get; }
     private Dictionary<string, Dictionary<string, T>> LocalRegisterDict { get; } = [];
     private Func<LocalizedRegister<T>, string, T> DefaultGetter { get; }
+    private Func<LocalizedRegister<T>, string, bool> DefaultFinder { get; }
 
     #endregion
 
@@ -94,6 +107,11 @@ public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
         return DefaultGetter(this, id);
     }
 
+    public bool ItemRegistered(string id)
+    {
+        return ItemRegisteredInLocal(Local, id) || DefaultFinder(this, id);
+    }
+
     private bool GetItemInLocal(string local, string id, [MaybeNullWhen(false)] out T item)
     {
         item = default(T);
@@ -102,6 +120,11 @@ public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
             regDict.TryGetValue(id, out item)) return true;
 
         return false;
+    }
+
+    public bool ItemRegisteredInLocal(string local, string id)
+    {
+        return LocalRegisterDict.TryGetValue(local, out var regDict) && regDict.ContainsKey(id);
     }
 
     #endregion
