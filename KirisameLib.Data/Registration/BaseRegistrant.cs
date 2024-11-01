@@ -2,15 +2,10 @@ using KirisameLib.Data.Model;
 
 namespace KirisameLib.Data.Registration;
 
-public abstract class Registrant<TSource>
-{
-    public abstract (string id, Func<bool> register)[] Parse(TSource source, out ModelParseErrorInfo errorMessages);
-}
-
-public abstract class Registrant<TSource, TModel, TTarget>(RegisterItem<TTarget> registerItem) : Registrant<TSource>
+public abstract class BaseRegistrant<TSource, TModel, TTarget>(RegisterItem<TTarget> registerItem) : IRegistrant<TSource>
     where TModel : IModel<TSource, TTarget>
 {
-    public override (string id, Func<bool> register)[] Parse(TSource source, out ModelParseErrorInfo errorMessages)
+    public virtual (string id, Func<bool> register)[] Parse(TSource source, out ModelParseErrorInfo errorMessages)
     {
         var models = TModel.FromSource(source, out errorMessages);
         return models.Select(GetRegister).ToArray();

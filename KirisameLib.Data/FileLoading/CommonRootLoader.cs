@@ -4,7 +4,7 @@ using KirisameLib.Data.Registration;
 namespace KirisameLib.Data.FileLoading;
 
 public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSource, TRegistrant>
-    where TRegistrant : Registrant<TSource>
+    where TRegistrant : IRegistrant<TSource>
 {
     private LinkedList<string> PathLink { get; } = [];
     private Stack<RegisterInfo> RegisterStack { get; } = [];

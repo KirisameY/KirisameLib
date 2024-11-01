@@ -14,7 +14,7 @@ public abstract class RootLoader
 }
 
 public abstract class RootLoader<TSource, TRegistrant> : RootLoader
-    where TRegistrant : Registrant<TSource>
+    where TRegistrant : IRegistrant<TSource>
 {
     private Dictionary<string, TRegistrant> PathMap { get; } = new();
     private ReadOnlyDictionary<string, TRegistrant>? _pathMapView;
