@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace KirisameLib.Data.Model;
 
 public interface IModel<out TTarget>
@@ -8,5 +10,5 @@ public interface IModel<out TTarget>
 
 public interface IModel<in TSource, out TTarget> : IModel<TTarget>
 {
-    static abstract IModel<TTarget>[] FromSource(TSource source, out ModelParseErrorInfo errorMessages);
+    static abstract IReadOnlyCollection<IModel<TTarget>> FromSource(TSource source, out ModelParseErrorInfo errorMessages);
 }
