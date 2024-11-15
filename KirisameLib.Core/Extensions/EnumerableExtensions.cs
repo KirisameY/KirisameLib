@@ -11,6 +11,16 @@ public static class EnumerableExtensions
         }
     }
 
+    public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T, int> action)
+    {
+        int index = 0;
+        foreach (var element in enumerable)
+        {
+            action(element, index);
+            index++;
+        }
+    }
+
     public static int PositionOfFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate)
     {
         int order = 0;
