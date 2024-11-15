@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace KirisameLib.Data.Model;
 
 public interface IModel<out TTarget>
