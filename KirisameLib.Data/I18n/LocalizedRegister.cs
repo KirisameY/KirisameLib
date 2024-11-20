@@ -18,9 +18,15 @@ public abstract class LocalizedRegister
             var prev = Local;
             _local = value;
             StaticLogger.Log(LogLevel.Info, "Setting", $"Local changed to '{value}' from '{prev}'");
-            EventBus.Publish(new LocalChangedEvent(prev, value));
+            LocalChangedEvent?.Invoke(prev, value);
         }
     }
+
+
+    //Event
+    delegate void LocalChangedEventHandler(string prev, string next);
+
+    private static event LocalChangedEventHandler? LocalChangedEvent;
 
 
     //Logging

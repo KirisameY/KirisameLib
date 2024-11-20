@@ -2,6 +2,7 @@
 
 namespace KirisameLib.Core.Logging;
 
+//todo: 讲真Log不宜直接用，该throw就throw该Try和out就Try然后out，不要干涉用户的日志怎么整（回头直接把log搬到新项目里
 public static partial class LogManager
 {
     private static ConcurrentQueue<Log> LogQueue { get; } = [];
