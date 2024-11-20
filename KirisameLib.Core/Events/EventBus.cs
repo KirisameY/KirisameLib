@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
-using KirisameLib.Core.Extensions;
-
 namespace KirisameLib.Core.Events;
 
 //todo: 生成器就生成一个接受总线实例的注册方法
@@ -31,13 +29,13 @@ public class EventBus
 
 
     private bool _handlingEvent = false;
-    private Queue<Action> _eventQueue = [];
+    private readonly Queue<Action> _eventQueue = [];
 
     private void EmitEvent<TEvent>(TEvent @event) where TEvent : BaseEvent
     {
         var type = typeof(TEvent);
         List<Exception> exceptions = [];
-        
+
         //遍历Event类型基类直至BaseEvent(其基类是object)
         while (type != typeof(object))
         {
@@ -54,15 +52,15 @@ public class EventBus
 
             type = type!.BaseType;
         }
-        
+
         if (exceptions.Count > 0) throw new EventHandlingException(exceptions, @event);
     }
 
-    private void HandleEventQueue<TEvent>() where TEvent : BaseEvent
+    private void HandleEventQueue()
     {
         _handlingEvent = true;
         List<EventHandlingException> exceptions = [];
-        
+
         while (_eventQueue.TryDequeue(out var eventAction))
         {
             try
@@ -78,13 +76,25 @@ public class EventBus
 
         if (exceptions.Count > 0) throw new QueueEventHandlingException(exceptions);
     }
-    
+
     public void Publish<TEvent>(TEvent @event) where TEvent : BaseEvent
     {
         _eventQueue.Enqueue(() => EmitEvent(@event));
-        if (_handlingEvent) return;
+        if (!_handlingEvent) HandleEventQueue();
+    }
 
-        HandleEventQueue<TEvent>();
+    public EventTask<TEvent> PublishAndWaitFor<TEvent>(TEvent @event) where TEvent : BaseEvent
+    {
+        EventTask<TEvent> eventTask = new(@event);
+        _eventQueue.Enqueue(() =>
+        {
+            EmitEvent(@event);
+            eventTask.Complete();
+        });
+
+        if (!_handlingEvent) HandleEventQueue();
+
+        return eventTask;
     }
 
 
