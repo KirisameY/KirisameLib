@@ -4,6 +4,7 @@ using KirisameLib.Core.Logging;
 
 namespace KirisameLib.Core.Events;
 
+[Obsolete("Ready to remove, use generated code instead")]
 public static class EventHandlerSubscriber
 {
     static EventHandlerSubscriber()
@@ -57,9 +58,9 @@ public static class EventHandlerSubscriber
             var delegateType = typeof(Action<>).MakeGenericType(eventType);
             var delegateInstance = method.CreateDelegate(delegateType, container);
             if (register)
-                typeof(EventBus).GetMethod(nameof(EventBus.Subscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
+                typeof(ImmediateEventBus).GetMethod(nameof(ImmediateEventBus.Subscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
             else
-                typeof(EventBus).GetMethod(nameof(EventBus.Unsubscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
+                typeof(ImmediateEventBus).GetMethod(nameof(ImmediateEventBus.Unsubscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
         }
     }
 
@@ -115,7 +116,7 @@ public static class EventHandlerSubscriber
 
             var delegateType = typeof(Action<>).MakeGenericType(eventType);
             var delegateInstance = method.CreateDelegate(delegateType);
-            typeof(EventBus).GetMethod(nameof(EventBus.Subscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
+            typeof(ImmediateEventBus).GetMethod(nameof(ImmediateEventBus.Subscribe))!.MakeGenericMethod(eventType).Invoke(null, [delegateInstance]);
         }
     }
 

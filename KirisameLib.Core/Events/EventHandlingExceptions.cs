@@ -1,0 +1,15 @@
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+
+namespace KirisameLib.Core.Events;
+
+public class EventHandlingException(IEnumerable<Exception> innerExceptions, BaseEvent @event) : AggregateException(innerExceptions)
+{
+    public BaseEvent FromEvent => @event;
+}
+
+public class QueueEventHandlingException(IEnumerable<EventHandlingException> innerExceptions) : AggregateException(innerExceptions)
+{
+    [field: AllowNull, MaybeNull]
+    public ReadOnlyCollection<EventHandlingException> EventHandlingExceptions => field ??= new(innerExceptions.ToList());
+}

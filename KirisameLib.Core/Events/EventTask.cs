@@ -4,12 +4,20 @@ namespace KirisameLib.Core.Events;
 
 public class EventTask<TEvent> where TEvent : BaseEvent
 {
-    internal EventTask(TEvent @event)
+    internal EventTask(TEvent @event, Action<EventTask<TEvent>> readyAction)
     {
         Event = @event;
+        _readyAction = readyAction;
     }
 
+    private readonly Action<EventTask<TEvent>> _readyAction;
     private Action? _continueAction;
+
+    public bool IsReady { get; private set; } = false;
+    public bool IsCompleted { get; private set; } = false;
+
+    public TEvent Event { get; private init; }
+
 
     internal void Complete()
     {
@@ -17,13 +25,29 @@ public class EventTask<TEvent> where TEvent : BaseEvent
         _continueAction?.Invoke();
     }
 
-    public bool IsCompleted { get; private set; } = false;
-
-    public TEvent Event { get; private init; }
-
     public EventAwaiter<TEvent> GetAwaiter() => new(this);
 
-    public void ContinueWith(Action continuation) => _continueAction += continuation;
+    public EventTask<TEvent> ContinueWith(Action continuation)
+    {
+        if (IsCompleted) continuation.Invoke();
+        else _continueAction += continuation;
+        return this;
+    }
+
+    public EventTask<TEvent> ContinueWith(Action<TEvent> continuation)
+    {
+        var action = () => continuation.Invoke(Event);
+        if (IsCompleted) action.Invoke();
+        else _continueAction += action;
+        return this;
+    }
+
+    public void Ready()
+    {
+        if (IsReady) return;
+        IsReady = true;
+        _readyAction.Invoke(this);
+    }
 }
 
 public readonly struct EventAwaiter<TEvent> : INotifyCompletion where TEvent : BaseEvent
@@ -39,5 +63,5 @@ public readonly struct EventAwaiter<TEvent> : INotifyCompletion where TEvent : B
 
     public bool IsCompleted => _task.IsCompleted;
 
-    public void OnCompleted(Action continuation) => _task.ContinueWith(continuation);
+    public void OnCompleted(Action continuation) => _task.ContinueWith(continuation).Ready();
 }
