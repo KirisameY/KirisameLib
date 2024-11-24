@@ -8,7 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj" />
+        <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj"
+                          GeneratePathProperty="true"
+                          PrivateAssets="all"/>
     </ItemGroup>
 
 </Project>

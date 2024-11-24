@@ -24,4 +24,10 @@
       <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\KirisameLib.Core.SourceGenerator\KirisameLib.Core.SourceGenerator.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+
 </Project>

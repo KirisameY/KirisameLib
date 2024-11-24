@@ -10,7 +10,7 @@ public abstract class EventBus
     /// <returns>
     ///     Callback to remove registered handler, useful when unregistering an anonymous function
     /// </returns>
-    public Action Subscribe<TEvent>(Action<TEvent> handler)
+    public Action Subscribe<TEvent>(Action<TEvent> handler, HandlerSubscribeFlag flag = HandlerSubscribeFlag.None) //todo: impl flags
         where TEvent : BaseEvent
     {
         var handlerDelegate = _handlerDict.GetValueOrDefault(typeof(TEvent)) as Action<TEvent>;
