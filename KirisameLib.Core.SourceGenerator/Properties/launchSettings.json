@@ -4,6 +4,10 @@
     "Generators": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "../KirisameLib.Core.Test/KirisameLib.Core.Test.csproj"
+    },
+    "Generators_BR": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../BabelRush/BabelRush/BabelRush.csproj"
     }
   }
 }

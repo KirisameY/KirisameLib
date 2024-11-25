@@ -6,6 +6,7 @@ using KirisameLib.GeneratorTools.Extensions;
 using KirisameLib.GeneratorTools.Utils;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace KirisameLib.Core.SourceGenerator.Generators;
@@ -52,17 +53,20 @@ public class EventHandlerGenerator : IIncrementalGenerator
         INamedTypeSymbol ClassSymbol,
         bool Static,
         bool Inherited,
+        bool Sealed,
         FrozenDictionary<string, List<EventHandlerInfo>> StaticEventHandlers,
         FrozenDictionary<string, List<EventHandlerInfo>> InstanceEventHandlers
     );
 
-    private static bool EventHandlerClassPredicate(SyntaxNode node, CancellationToken _) => node is ClassDeclarationSyntax;
+    private static bool EventHandlerClassPredicate(SyntaxNode node, CancellationToken _) =>
+        node is ClassDeclarationSyntax { Modifiers: [var first, ..] } &&
+        first.Kind() is SyntaxKind.PublicKeyword or SyntaxKind.InternalKeyword;
 
     private static INamedTypeSymbol? EventHandlerClassSymbolTransform(GeneratorSyntaxContext context, CancellationToken _)
     {
         var model = context.SemanticModel;
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
-        var classSymbol = model.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
+        var classSymbol = ModelExtensions.GetDeclaredSymbol(model, classDeclaration) as INamedTypeSymbol;
 
         return classSymbol!.GetAttributes().Any(a => a.AttributeClass!.IsDerivedFrom(Names.EventHandlerContainerAttribute))
             ? classSymbol : null;
@@ -72,11 +76,13 @@ public class EventHandlerGenerator : IIncrementalGenerator
     {
         bool isStatic = classSymbol.IsStatic;
 
-        bool inherited = classSymbol is
+        var inherited = classSymbol is
         {
             IsStatic: false,
             BaseType: { } baseType
         } && baseType.GetAttributes().Any(a => a.AttributeClass!.IsDerivedFrom(Names.EventHandlerContainerAttribute));
+
+        var @sealed = classSymbol.IsSealed;
 
         //methods
         Dictionary<string, List<EventHandlerInfo>> staticHandlers = [],
@@ -112,7 +118,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
             }
         }
 
-        return new(classSymbol, isStatic, inherited, staticHandlers.ToFrozenDictionary(), instanceHandlers.ToFrozenDictionary());
+        return new(classSymbol, isStatic, inherited, @sealed, staticHandlers.ToFrozenDictionary(), instanceHandlers.ToFrozenDictionary());
     }
 
     #endregion
@@ -222,7 +228,12 @@ public class EventHandlerGenerator : IIncrementalGenerator
 
             sourceBuilder.AppendLine()
                          .AppendLine(Global.GeneratedCodeAttribute)
-                         .Append(classInfo.Inherited ? "protected override " : "protected virtual ")
+                         .Append((classInfo.Inherited, classInfo.Sealed) switch
+                          {
+                              (true, _)      => "protected override ",
+                              (false, false) => "protected virtual ",
+                              (false, true)  => "private ",
+                          })
                          .AppendLine($"void SubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
                          .AppendLine("{");
             using (sourceBuilder.Indent())
@@ -255,7 +266,12 @@ public class EventHandlerGenerator : IIncrementalGenerator
 
             sourceBuilder.AppendLine()
                          .AppendLine(Global.GeneratedCodeAttribute)
-                         .Append(classInfo.Inherited ? "protected override " : "protected virtual ")
+                         .Append((classInfo.Inherited, classInfo.Sealed) switch
+                          {
+                              (true, _)      => "protected override ",
+                              (false, false) => "protected virtual ",
+                              (false, true)  => "private ",
+                          })
                          .AppendLine($"void UnsubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
                          .AppendLine("{");
             using (sourceBuilder.Indent())
@@ -285,7 +301,6 @@ public class EventHandlerGenerator : IIncrementalGenerator
             #endregion
         }
         sourceBuilder.AppendLine("}");
-
 
         context.AddSource($"{classFullName}{Names.SourceFileNameSuffix}", sourceBuilder.ToString());
     }
@@ -331,7 +346,6 @@ public class EventHandlerGenerator : IIncrementalGenerator
             sourceBuilder.AppendLine("}");
 
             #endregion
-            
         }
         sourceBuilder.AppendLine("}");
 

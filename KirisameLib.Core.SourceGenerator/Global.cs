@@ -1,6 +1,4 @@
-﻿using System.CodeDom.Compiler;
-
-namespace KirisameLib.Core.SourceGenerator;
+﻿namespace KirisameLib.Core.SourceGenerator;
 
 public class Global
 {

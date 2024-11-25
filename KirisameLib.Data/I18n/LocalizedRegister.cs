@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 
-using KirisameLib.Core.Events;
 using KirisameLib.Core.Logging;
 using KirisameLib.Data.Register;
 
@@ -24,9 +23,9 @@ public abstract class LocalizedRegister
 
 
     //Event
-    delegate void LocalChangedEventHandler(string prev, string next);
+    public delegate void LocalChangedEventHandler(string prev, string next);
 
-    private static event LocalChangedEventHandler? LocalChangedEvent;
+    public static event LocalChangedEventHandler? LocalChangedEvent;
 
 
     //Logging

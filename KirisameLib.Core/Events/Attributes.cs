@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 #pragma warning disable CS9113
 
 namespace KirisameLib.Core.Events;
