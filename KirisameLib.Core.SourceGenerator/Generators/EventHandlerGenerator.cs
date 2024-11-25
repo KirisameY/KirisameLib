@@ -22,7 +22,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
         public const string BaseEvent = "KirisameLib.Core.Events.BaseEvent";
         public const string HandlerSubscribeFlag = "KirisameLib.Core.Events.HandlerSubscribeFlag";
 
-        public const string SourceFileNameSuffix = "_EventBus.generated.cs";
+        public const string SourceFileNameSuffix = "_EventHandlerSubscriber.generated.cs";
         public const string GlobalClassFileName = "GlobalEventHandlersSubscriber.generated.cs";
         public const string GlobalClassNamespace = "KirisameLib.Core.Events.Generated";
         public const string GlobalClassName = "GlobalEventHandlersSubscriber";
@@ -155,6 +155,8 @@ public class EventHandlerGenerator : IIncrementalGenerator
                      .AppendLine("{");
         using (sourceBuilder.Indent())
         {
+            #region Static Subscribe
+
             sourceBuilder.AppendLine(Global.GeneratedCodeAttribute)
                          .Append(classInfo.Inherited ? "internal new " : "internal ")
                          .AppendLine($"static void SubscribeStaticHandler(global::{Names.EventBus} bus, string group = \"\")")
@@ -181,6 +183,42 @@ public class EventHandlerGenerator : IIncrementalGenerator
                              .AppendLine("}");
             }
             sourceBuilder.AppendLine("}");
+
+            #endregion
+
+            #region Static Unubscribe
+
+            sourceBuilder.AppendLine()
+                         .AppendLine(Global.GeneratedCodeAttribute)
+                         .Append(classInfo.Inherited ? "internal new " : "internal ")
+                         .AppendLine($"static void UnsubscribeStaticHandler(global::{Names.EventBus} bus, string group = \"\")")
+                         .AppendLine("{");
+            using (sourceBuilder.Indent())
+            {
+                sourceBuilder.AppendLine("switch (group)")
+                             .AppendLine("{")
+                             .IncreaseIndent();
+                foreach (var (group, handlers) in classInfo.StaticEventHandlers)
+                {
+                    sourceBuilder.AppendLine($"case \"{group}\":");
+                    using (sourceBuilder.Indent())
+                    {
+                        foreach (var (methodName, eventType, _) in handlers)
+                        {
+                            sourceBuilder.AppendLine
+                                ($"bus.Unsubscribe<global::{eventType}>({methodName});");
+                        }
+                        sourceBuilder.AppendLine("break;");
+                    }
+                }
+                sourceBuilder.DecreaseIndent()
+                             .AppendLine("}");
+            }
+            sourceBuilder.AppendLine("}");
+
+            #endregion
+
+            #region Instance Subscribe
 
             sourceBuilder.AppendLine()
                          .AppendLine(Global.GeneratedCodeAttribute)
@@ -210,6 +248,41 @@ public class EventHandlerGenerator : IIncrementalGenerator
                 if (classInfo.Inherited) sourceBuilder.AppendLine("base.SubscribeInstanceHandler(bus, group);");
             }
             sourceBuilder.AppendLine("}");
+
+            #endregion
+
+            #region Instance Unsubscribe
+
+            sourceBuilder.AppendLine()
+                         .AppendLine(Global.GeneratedCodeAttribute)
+                         .Append(classInfo.Inherited ? "protected override " : "protected virtual ")
+                         .AppendLine($"void UnsubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
+                         .AppendLine("{");
+            using (sourceBuilder.Indent())
+            {
+                sourceBuilder.AppendLine("switch (group)")
+                             .AppendLine("{")
+                             .IncreaseIndent();
+                foreach (var (group, handlers) in classInfo.InstanceEventHandlers)
+                {
+                    sourceBuilder.AppendLine($"case \"{group}\":");
+                    using (sourceBuilder.Indent())
+                    {
+                        foreach (var (methodName, eventType, _) in handlers)
+                        {
+                            sourceBuilder.AppendLine
+                                ($"bus.Unsubscribe<global::{eventType}>({methodName});");
+                        }
+                        sourceBuilder.AppendLine("break;");
+                    }
+                }
+                sourceBuilder.DecreaseIndent()
+                             .AppendLine("}");
+                if (classInfo.Inherited) sourceBuilder.AppendLine("base.UnsubscribeInstanceHandler(bus, group);");
+            }
+            sourceBuilder.AppendLine("}");
+
+            #endregion
         }
         sourceBuilder.AppendLine("}");
 
@@ -228,6 +301,8 @@ public class EventHandlerGenerator : IIncrementalGenerator
                      .AppendLine("{");
         using (sourceBuilder.Indent())
         {
+            #region Subscribe
+
             sourceBuilder.AppendLine($"public static void Subscribe(global::{Names.EventBus} bus, string group = \"\")")
                          .AppendLine("{");
             using (sourceBuilder.Indent())
@@ -238,6 +313,25 @@ public class EventHandlerGenerator : IIncrementalGenerator
                 }
             }
             sourceBuilder.AppendLine("}");
+
+            #endregion
+
+            #region Unsubscribe
+
+            sourceBuilder.AppendLine()
+                         .AppendLine($"public static void Unsubscribe(global::{Names.EventBus} bus, string group = \"\")")
+                         .AppendLine("{");
+            using (sourceBuilder.Indent())
+            {
+                foreach (var info in globalStaticHandlersInfos)
+                {
+                    sourceBuilder.AppendLine($"global::{info.ClassFullName}.UnsubscribeStaticHandler(bus, group);");
+                }
+            }
+            sourceBuilder.AppendLine("}");
+
+            #endregion
+            
         }
         sourceBuilder.AppendLine("}");
 
