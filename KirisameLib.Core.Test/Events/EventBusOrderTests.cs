@@ -17,6 +17,8 @@ public class EventBusOrderTests
 
         bus.Subscribe<TestEvent>(e => Console.WriteLine(e.Message));
         bus.Subscribe<TestEvent>(e => received.Add(e.Message));
+        bus.Subscribe<TestEvent>(e => Console.WriteLine($"once: {e.Message}"), HandlerSubscribeFlag.OnlyOnce);
+        bus.Subscribe<TestEvent>(e => received.Add($"once: {e.Message}"),      HandlerSubscribeFlag.OnlyOnce);
         bus.Subscribe<SendEvent>(e => bus.Publish(new EchoEvent(GetEcho(e.Message))));
 
         bus.Publish(new SendEvent("Hello World!"));
@@ -36,6 +38,7 @@ public class EventBusOrderTests
         string[] expected =
         [
             "Hello World!",
+            "once: Hello World!",
             GetEcho("Hello World!"),
             "And I send this first",
             "and put this stealthily 3rd",

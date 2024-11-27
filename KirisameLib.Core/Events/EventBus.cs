@@ -1,28 +1,32 @@
 ﻿namespace KirisameLib.Core.Events;
 
-//todo: 生成器就生成一个接受总线实例的注册方法
-//      然后静态的部分也这样，之后生成一个总和的类来注册所有同一标记的静态事件处理器的方法（事件处理器标签上加个字符串参数应该就可以）
 public abstract class EventBus
 {
-    private readonly Dictionary<Type, Delegate?> _handlerDict = new();
+    private readonly Dictionary<Type, HandlerInfos> _handlersDict = new();
     protected readonly Queue<Action> NotifyQueue = [];
 
     /// <returns>
     ///     Callback to remove registered handler, useful when unregistering an anonymous function
     /// </returns>
-    public Action Subscribe<TEvent>(Action<TEvent> handler, HandlerSubscribeFlag flag = HandlerSubscribeFlag.None) //todo: impl flags
+    public Action Subscribe<TEvent>(Action<TEvent> handler, HandlerSubscribeFlag flags = HandlerSubscribeFlag.None) //todo: impl flags
         where TEvent : BaseEvent
     {
-        var handlerDelegate = _handlerDict.GetValueOrDefault(typeof(TEvent)) as Action<TEvent>;
-        _handlerDict[typeof(TEvent)] = Delegate.Combine(handlerDelegate, handler);
+        if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
+            _handlersDict[typeof(TEvent)] = handlerInfos = new();
+
+        handlerInfos.Handlers = Delegate.Combine(handlerInfos.Handlers, handler);
+        //record only once handlers
+        if (flags.HasFlag(HandlerSubscribeFlag.OnlyOnce)) handlerInfos.OneTimeHandlers.Add(handler);
         return () => Unsubscribe(handler);
     }
 
     public void Unsubscribe<TEvent>(Action<TEvent> handler)
         where TEvent : BaseEvent
     {
-        var handlerDelegate = _handlerDict.GetValueOrDefault(typeof(TEvent)) as Action<TEvent>;
-        _handlerDict[typeof(TEvent)] = Delegate.Remove(handlerDelegate, handler);
+        if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
+            _handlersDict[typeof(TEvent)] = handlerInfos = new();
+
+        handlerInfos.Handlers = Delegate.Remove(handlerInfos.Handlers, handler);
     }
 
     private void EmitEvent<TEvent>(TEvent @event) where TEvent : BaseEvent
@@ -33,15 +37,24 @@ public abstract class EventBus
         //遍历Event类型基类直至BaseEvent(其基类是object)
         while (type != typeof(object))
         {
-            //监听者产生的异常集中处理
-            try
+            if (_handlersDict.TryGetValue(type!, out var handlerInfos))
             {
-                var handlerDelegate = _handlerDict.GetValueOrDefault(type!) as Action<TEvent>;
-                handlerDelegate?.Invoke(@event);
-            }
-            catch (Exception e)
-            {
-                exceptions.Add(e);
+                //监听者产生的异常集中处理
+                try
+                {
+                    var handlerDelegate = handlerInfos.Handlers as Action<TEvent>;
+                    handlerDelegate?.Invoke(@event);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                }
+
+                //移除一次性Handlers
+                foreach (var oneTimeHandler in handlerInfos.OneTimeHandlers)
+                {
+                    handlerInfos.Handlers = Delegate.Remove(handlerInfos.Handlers, oneTimeHandler);
+                }
             }
 
             type = type!.BaseType;
@@ -74,5 +87,12 @@ public abstract class EventBus
             });
             EventReceived();
         });
+    }
+
+
+    private class HandlerInfos
+    {
+        public Delegate? Handlers { get; set; }
+        public List<Delegate> OneTimeHandlers { get; } = [];
     }
 }
