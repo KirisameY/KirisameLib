@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.Events;
+namespace KirisameLib.Event;
 
 public sealed class CancelToken
 {

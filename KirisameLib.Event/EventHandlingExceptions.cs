@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace KirisameLib.Core.Events;
+namespace KirisameLib.Event;
 
 public class EventHandlingException(IEnumerable<Exception> innerExceptions, BaseEvent @event) : AggregateException(innerExceptions)
 {

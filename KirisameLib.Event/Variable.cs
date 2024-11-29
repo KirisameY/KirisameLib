@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.Events;
+namespace KirisameLib.Event;
 
 public class Variable<T>(T value)
 {

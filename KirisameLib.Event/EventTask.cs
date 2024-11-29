@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace KirisameLib.Core.Events;
+namespace KirisameLib.Event;
 
 public class EventTask<TEvent> where TEvent : BaseEvent
 {

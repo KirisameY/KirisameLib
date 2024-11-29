@@ -4,16 +4,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>KirisameLib.Core</RootNamespace>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Events\" />
+      <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj" />
     </ItemGroup>
 
 </Project>

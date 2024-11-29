@@ -1,4 +1,4 @@
-﻿namespace KirisameLib.Core.Events;
+﻿namespace KirisameLib.Event;
 
 public abstract class EventBus
 {

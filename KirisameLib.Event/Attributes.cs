@@ -1,6 +1,6 @@
 #pragma warning disable CS9113
 
-namespace KirisameLib.Core.Events;
+namespace KirisameLib.Event;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class EventHandlerContainerAttribute : Attribute;

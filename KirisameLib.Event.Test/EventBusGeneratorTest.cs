@@ -1,6 +1,4 @@
-﻿using KirisameLib.Core.Events;
-
-namespace KirisameLib.Core.Test.Events;
+﻿namespace KirisameLib.Event.Test;
 
 public class EventBusGeneratorTest
 {

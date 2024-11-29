@@ -21,7 +21,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj" />
+        <ProjectReference Include="..\KirisameLib.Event.SourceGenerator\KirisameLib.Event.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\KirisameLib.Event\KirisameLib.Event.csproj" />
     </ItemGroup>
 
 </Project>

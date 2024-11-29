@@ -8,23 +8,23 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace KirisameLib.Core.SourceGenerator.Generators;
+namespace KirisameLib.Event.SourceGenerator.Generators;
 
 [Generator]
 public class EventHandlerGenerator : IIncrementalGenerator
 {
     private static class Names
     {
-        public const string EventHandlerContainerAttribute = "KirisameLib.Core.Events.EventHandlerContainerAttribute";
-        public const string EventHandlerAttribute = "KirisameLib.Core.Events.EventHandlerAttribute";
+        public const string EventHandlerContainerAttribute = "KirisameLib.Event.EventHandlerContainerAttribute";
+        public const string EventHandlerAttribute = "KirisameLib.Event.EventHandlerAttribute";
 
-        public const string EventBus = "KirisameLib.Core.Events.EventBus";
-        public const string BaseEvent = "KirisameLib.Core.Events.BaseEvent";
-        public const string HandlerSubscribeFlag = "KirisameLib.Core.Events.HandlerSubscribeFlag";
+        public const string EventBus = "KirisameLib.Event.EventBus";
+        public const string BaseEvent = "KirisameLib.Event.BaseEvent";
+        public const string HandlerSubscribeFlag = "KirisameLib.Event.HandlerSubscribeFlag";
 
         public const string SourceFileNameSuffix = "_EventHandlerSubscriber.generated.cs";
         public const string GlobalClassFileName = "GlobalEventHandlersSubscriber.generated.cs";
-        public const string GlobalClassNamespace = "KirisameLib.Core.Events.Generated";
+        public const string GlobalClassNamespace = "KirisameLib.Event.Generated";
         public const string GlobalClassName = "GlobalEventHandlersSubscriber";
     }
 

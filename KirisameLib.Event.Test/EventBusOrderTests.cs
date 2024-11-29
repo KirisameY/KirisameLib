@@ -1,7 +1,6 @@
-﻿using KirisameLib.Core.Events;
-using KirisameLib.Core.Extensions;
+﻿using KirisameLib.Core.Extensions;
 
-namespace KirisameLib.Core.Test.Events;
+namespace KirisameLib.Event.Test;
 
 public class EventBusOrderTests
 {
