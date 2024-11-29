@@ -65,7 +65,7 @@ public partial class TestBaseClass(string name, Action<string> handler)
     public void Register(EventBus bus) => SubscribeInstanceHandler(bus);
 }
 
-[EventHandlerContainer]//todo: bug:这个特性没法去
+// [EventHandlerContainer]
 public partial class TestInheritedClass(string name, Action<string> handler) : TestBaseClass(name, handler)
 {
     private readonly Action<string> _handler = handler;

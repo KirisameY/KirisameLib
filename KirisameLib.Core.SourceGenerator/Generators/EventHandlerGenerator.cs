@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 
 using KirisameLib.GeneratorTools;
 using KirisameLib.GeneratorTools.Extensions;
-using KirisameLib.GeneratorTools.Utils;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -37,8 +36,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
                                        .WhereNotNull()
                                        .Select(EventHandlerClassInfoTransform);
 
-        var globalInfoProvider = classInfoProvider.Collect()
-                                                  .Select(SelectGlobalHandlersInfo);
+        var globalInfoProvider = classInfoProvider.Collect().Select(SelectGlobalHandlersInfo);
 
         context.RegisterSourceOutput(classInfoProvider,  GenerateForClass);
         context.RegisterSourceOutput(globalInfoProvider, GenerateForGlobal);
@@ -68,7 +66,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
         var classSymbol = ModelExtensions.GetDeclaredSymbol(model, classDeclaration) as INamedTypeSymbol;
 
-        return classSymbol!.GetAttributes().Any(a => a.AttributeClass!.IsDerivedFrom(Names.EventHandlerContainerAttribute))
+        return classSymbol!.GetAllAttributes().Any(a => a.AttributeClass!.IsDerivedFrom(Names.EventHandlerContainerAttribute))
             ? classSymbol : null;
     }
 

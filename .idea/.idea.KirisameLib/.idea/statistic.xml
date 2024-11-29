@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Statistic">
+    <option name="fileTypes" value="class;svn-base;svn-work;Extra;gif;png;jpg;jpeg;bmp;tga;tiff;ear;war;zip;jar;iml;iws;ipr;bz2;gz;pyc;dll;pdb;cache;exe;" />
+    <option name="excludeDotArtifactDirectory" value="true" />
+    <option name="excludedDirectories">
+      <list>
+        <option value="$PROJECT_DIR$/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core.SourceGenerator/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core.SourceGenerator/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core.Test/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Core.Test/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Data/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Data/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.GeneratorTools/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.GeneratorTools/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.GeneratorTools/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.GeneratorTools/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Godot/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Godot/obj" />
+        <option value="$PROJECT_DIR$/KirisameLib.Logging/bin" />
+        <option value="$PROJECT_DIR$/KirisameLib.Logging/obj" />
+      </list>
+    </option>
+  </component>
+</project>

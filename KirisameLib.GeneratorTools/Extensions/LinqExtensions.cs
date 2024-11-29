@@ -12,4 +12,22 @@ public static class LinqExtensions
     {
         return source.Select(selector).OfType<TResult>();
     }
+
+    public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T, int> action)
+    {
+        int index = 0;
+        foreach (var element in enumerable)
+        {
+            action(element, index);
+            index++;
+        }
+    }
+
+    public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+    {
+        foreach (var element in enumerable)
+        {
+            action(element);
+        }
+    }
 }

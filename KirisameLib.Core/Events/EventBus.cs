@@ -8,7 +8,7 @@ public abstract class EventBus
     /// <returns>
     ///     Callback to remove registered handler, useful when unregistering an anonymous function
     /// </returns>
-    public Action Subscribe<TEvent>(Action<TEvent> handler, HandlerSubscribeFlag flags = HandlerSubscribeFlag.None) //todo: impl flags
+    public Action Subscribe<TEvent>(Action<TEvent> handler, HandlerSubscribeFlag flags = HandlerSubscribeFlag.None)
         where TEvent : BaseEvent
     {
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
