@@ -1,4 +1,6 @@
-﻿using KirisameLib.Core.Extensions;
+﻿using System.Diagnostics;
+
+using KirisameLib.Core.Extensions;
 
 namespace KirisameLib.Logging;
 
@@ -21,7 +23,7 @@ public sealed class LogWriter : IDisposable
 
     private async Task StartWriteLogAsync(CancellationToken cancellationToken)
     {
-        await Task.Yield();
+        await Task.Run(() => { }, CancellationToken.None).ConfigureAwait(false);//封装一下
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -37,7 +39,6 @@ public sealed class LogWriter : IDisposable
                 }
             }
         }
-
         _logWriters.ForEach(writer => writer.Dispose());
     }
 
