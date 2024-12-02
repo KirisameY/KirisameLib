@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+using KirisameLib.Core.Asynchronous;
 using KirisameLib.Core.Extensions;
 
 namespace KirisameLib.Logging;
@@ -23,7 +24,7 @@ public sealed class LogWriter : IDisposable
 
     private async Task StartWriteLogAsync(CancellationToken cancellationToken)
     {
-        await Task.Run(() => { }, CancellationToken.None).ConfigureAwait(false);//封装一下
+        await AsyncOrrery.SwitchContext();
 
         while (!cancellationToken.IsCancellationRequested)
         {
