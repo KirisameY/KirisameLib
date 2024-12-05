@@ -6,6 +6,7 @@ namespace KirisameLib.Event;
 public class EventHandlingException(IEnumerable<Exception> innerExceptions, BaseEvent @event) : AggregateException(innerExceptions)
 {
     public BaseEvent FromEvent => @event;
+    public override string ToString() => $"FromEvent:{FromEvent}, {base.ToString()}";
 }
 
 public class QueueEventHandlingException(IEnumerable<EventHandlingException> innerExceptions) : AggregateException(innerExceptions)

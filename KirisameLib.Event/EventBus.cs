@@ -40,6 +40,7 @@ public abstract class EventBus
             if (_handlersDict.TryGetValue(type!, out var handlerInfos))
             {
                 //监听者产生的异常集中处理
+                //todo: 异步处理器产生的异常没法处理，是否应考虑要求处理器返回一个task
                 try
                 {
                     var handlerDelegate = handlerInfos.Handlers as Action<TEvent>;

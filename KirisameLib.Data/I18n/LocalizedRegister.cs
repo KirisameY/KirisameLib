@@ -21,10 +21,10 @@ public abstract class LocalizedRegister
 
 
     //Event
-    public delegate void LocalChangedEventHandler(string prev, string next);
-
     public static event LocalChangedEventHandler? LocalChangedEvent;
 }
+
+public delegate void LocalChangedEventHandler(string prev, string current);
 
 public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
 {
