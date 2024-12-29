@@ -1,6 +1,6 @@
 ﻿using Godot;
 
-using KirisameLib.Core.Extensions;
+using KirisameLib.Extensions;
 
 namespace KirisameLib.Godot.Extensions;
 

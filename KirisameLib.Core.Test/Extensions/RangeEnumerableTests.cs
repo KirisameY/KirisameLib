@@ -1,4 +1,4 @@
-﻿using KirisameLib.Core.Extensions.Enumerable;
+﻿using KirisameLib.Extensions.Enumerable;
 
 namespace KirisameLib.Core.Test.Extensions;
 

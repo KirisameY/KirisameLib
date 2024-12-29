@@ -1,4 +1,4 @@
-﻿using KirisameLib.Core.Extensions;
+﻿using KirisameLib.Extensions;
 
 namespace KirisameLib.Event.Test;
 

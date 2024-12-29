@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.Numeric;
+namespace KirisameLib.Numeric;
 
 public class CommonModifier<T>(IModifierType<T> type, double value) : IModifier<T>
 {

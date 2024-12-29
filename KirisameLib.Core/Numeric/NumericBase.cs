@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace KirisameLib.Core.Numeric;
+namespace KirisameLib.Numeric;
 
 public abstract class NumericBase<T>
     where T : struct, INumber<T>

@@ -1,4 +1,4 @@
-﻿namespace KirisameLib.Core;
+﻿namespace KirisameLib;
 
 public abstract class InterpolationMap
 {

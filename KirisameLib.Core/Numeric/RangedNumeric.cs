@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace KirisameLib.Core.Numeric;
+namespace KirisameLib.Numeric;
 
 public class RangedNumeric<T>(T minValue = default, T maxValue = default, T value = default) : NumericBase<T>
     where T : struct, INumber<T>

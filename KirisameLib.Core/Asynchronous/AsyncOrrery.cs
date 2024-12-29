@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace KirisameLib.Core.Asynchronous;
+namespace KirisameLib.Asynchronous;
 
 public static class AsyncOrrery
 {

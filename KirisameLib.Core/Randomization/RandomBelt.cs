@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace KirisameLib.Core.RandomAsteroid;
+namespace KirisameLib.Randomization;
 
 public class RandomBelt<TGenerator>(TGenerator generator) : RandomBelt
     where TGenerator : IRandomGenerator

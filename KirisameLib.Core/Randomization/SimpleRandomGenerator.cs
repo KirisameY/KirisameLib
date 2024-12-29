@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.RandomAsteroid;
+namespace KirisameLib.Randomization;
 
 public abstract class SimpleRandomGenerator : IRandomGenerator
 {

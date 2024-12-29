@@ -1,4 +1,4 @@
-﻿namespace KirisameLib.Core.Extensions;
+﻿namespace KirisameLib.Extensions;
 
 public static class EnumerableExtensions
 {

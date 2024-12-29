@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.RandomAsteroid.RandomGenerators;
+namespace KirisameLib.Randomization.RandomGenerators;
 
 public class XorShiftGenerator(uint state) : SimpleRandomGenerator
 {

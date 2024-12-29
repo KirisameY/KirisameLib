@@ -1,4 +1,4 @@
-﻿namespace KirisameLib.Core.Extensions.Enumerable;
+﻿namespace KirisameLib.Extensions.Enumerable;
 
 public static class RangeEnumerableExtension
 {

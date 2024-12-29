@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.Numeric;
+namespace KirisameLib.Numeric;
 
 public class CommonModifierType<T>(int order, IModifierType<T>.ModifyFunc modify) : IModifierType<T>
 {

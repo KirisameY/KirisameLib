@@ -1,4 +1,4 @@
-namespace KirisameLib.Core.Numeric;
+namespace KirisameLib.Numeric;
 
 public interface IModifier<T>
 {

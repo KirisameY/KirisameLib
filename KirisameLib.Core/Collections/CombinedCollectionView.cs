@@ -2,7 +2,7 @@ using System.Collections;
 
 using JetBrains.Annotations;
 
-namespace KirisameLib.Core.Collections;
+namespace KirisameLib.Collections;
 
 public class CombinedCollectionView<T>(params IReadOnlyCollection<T>[] collections) : IReadOnlyCollection<T>, ICollection<T>
 {

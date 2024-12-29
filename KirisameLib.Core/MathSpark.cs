@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace KirisameLib.Core;
+namespace KirisameLib;
 
 public static class MathSpark
 {

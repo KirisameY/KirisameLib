@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-using KirisameLib.Core.Asynchronous;
-using KirisameLib.Core.Extensions;
+using KirisameLib.Asynchronous;
+using KirisameLib.Extensions;
 
 namespace KirisameLib.Logging;
 

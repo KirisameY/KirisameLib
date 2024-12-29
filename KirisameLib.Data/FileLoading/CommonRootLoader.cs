@@ -1,5 +1,5 @@
-﻿using KirisameLib.Core.Extensions;
-using KirisameLib.Data.Registration;
+﻿using KirisameLib.Data.Registration;
+using KirisameLib.Extensions;
 
 namespace KirisameLib.Data.FileLoading;
 
