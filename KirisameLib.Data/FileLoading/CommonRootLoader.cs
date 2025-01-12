@@ -56,8 +56,8 @@ public abstract class CommonRootLoader<TSource, TRegistrant> : RootLoader<TSourc
         var path = PathLink.Join('/');
         PathLink.RemoveLast();
 
-        var info = RegisterStack.Peek();
-        info.SubPathLink.RemoveLast();
+        if (!RegisterStack.TryPeek(out var info)) return false;
+        if (info.SubPathLink.Count > 0) info.SubPathLink.RemoveLast();
         if (info.Path != path) return false;
 
         var task = RegisterDirectory(info.Registrant, info.SourceDict);
