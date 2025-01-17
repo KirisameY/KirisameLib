@@ -6,6 +6,16 @@
         <Nullable>enable</Nullable>
         <RootNamespace>KirisameLib</RootNamespace>
         <LangVersion>preview</LangVersion>
+        
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.1.0</Version>
+        <Title>KirisameLib.Core</Title>
+        <Authors>KirisameY</Authors>
+        <PackageProjectUrl>https://github.com/KirisameY/KirisameLib</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KirisameY/KirisameLib/blob/master/KirisameLib.Core/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KirisameY/KirisameLib</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <ItemGroup>

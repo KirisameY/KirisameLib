@@ -4,6 +4,12 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
+        
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>KirisameLib.GeneratorTools</Title>
+        <Authors>KirisameY</Authors>
+        <Version>0.1.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,7 +17,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all"/>
     </ItemGroup>
 
 </Project>
