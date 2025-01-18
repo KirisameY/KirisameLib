@@ -21,12 +21,14 @@
     </ItemGroup>
 
     <ItemGroup>
-<!--        <ProjectReference Include="..\KirisameLib.Event.SourceGenerator\KirisameLib.Event.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />-->
-        <PackageReference Include="KirisameLib.Event.SourceGenerator" Version="0.1.5"/>
+        <!--        <PackageReference Include="KirisameLib.Event.SourceGenerator" Version="0.1.5"/>-->
+        <!--        <PackageReference Include="KirisameLib.Event" Version="0.1.1"/>-->
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\KirisameLib.Event\KirisameLib.Event.csproj" />
+        <ProjectReference Include="..\KirisameLib.Event\KirisameLib.Event.csproj"/>
+        <ProjectReference Include="..\KirisameLib.Event.SourceGenerator\KirisameLib.Event.SourceGenerator.csproj"
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
 </Project>
