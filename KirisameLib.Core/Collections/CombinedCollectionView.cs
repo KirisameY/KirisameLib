@@ -1,20 +1,23 @@
 using System.Collections;
+using System.Collections.Immutable;
 
 using JetBrains.Annotations;
 
 namespace KirisameLib.Collections;
 
-public class CombinedCollectionView<T>(params IReadOnlyCollection<T>[] collections) : IReadOnlyCollection<T>, ICollection<T>
+public class CombinedCollectionView<T>(params IEnumerable<IReadOnlyCollection<T>> collections) : IReadOnlyCollection<T>, ICollection<T>
 {
+    private readonly ImmutableArray<IReadOnlyCollection<T>> _collections = collections.ToImmutableArray();
+
     [MustDisposeResource]
-    public IEnumerator<T> GetEnumerator() => collections.SelectMany(collection => collection).GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => _collections.SelectMany(collection => collection).GetEnumerator();
 
     [MustDisposeResource]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public int Count => collections.Sum(c => c.Count);
+    public int Count => _collections.Sum(c => c.Count);
 
-    public bool Contains(T item) => collections.Any(collection => collection.Contains(item));
+    public bool Contains(T item) => _collections.Any(collection => collection.Contains(item));
 
 
     //ICollection
