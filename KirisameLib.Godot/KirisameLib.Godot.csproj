@@ -8,7 +8,7 @@
 
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.1.0</Version>
+        <Version>0.1.2</Version>
         <Title>KirisameLib.Godot</Title>
         <Authors>KirisameY</Authors>
         <PackageProjectUrl>https://github.com/KirisameY/KirisameLib</PackageProjectUrl>
@@ -19,11 +19,7 @@
 
     <ItemGroup>
         <PackageReference Include="GodotSharp" Version="4.3.0"/>
-        <PackageReference Include="KirisameLib.Core" Version="0.1.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <!--      <ProjectReference Include="..\KirisameLib.Core\KirisameLib.Core.csproj" />-->
+        <PackageReference Include="KirisameLib.Core" Version="0.1.2"/>
     </ItemGroup>
 
 </Project>
