@@ -1,5 +1,6 @@
 namespace KirisameLib.Data.Register;
 
+[Obsolete("Use MoltenRegister & FrozenRegister instead")]
 public class CommonRegister<T>(Func<string, T> defaultItemGetter) : IRegister<T>
 {
     private Dictionary<string, T> RegDict { get; } = [];
@@ -17,7 +18,7 @@ public class CommonRegister<T>(Func<string, T> defaultItemGetter) : IRegister<T>
         try { return DefaultItemGetter(id); }
         catch (Exception e)
         {
-            throw new GettingDefaultValueFailedException($"Failed to get default value for item: "
+            throw new GettingFallbackValueFailedException($"Failed to get default value for item: "
                                                        + $"ID: {id}, Type: {typeof(T).Name}", e);
         }
     }

@@ -89,7 +89,7 @@ public class LocalizedRegister<T> : LocalizedRegister, IRegister<T>
         try { return DefaultGetter(this, id); }
         catch (Exception e)
         {
-            throw new GettingDefaultValueFailedException($"Failed to get default value for item: "
+            throw new GettingFallbackValueFailedException($"Failed to get default value for item: "
                                                        + $"ID: {id}, Type: {typeof(T).Name}", e);
         }
     }

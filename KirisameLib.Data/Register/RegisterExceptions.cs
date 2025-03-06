@@ -1,3 +1,5 @@
-﻿namespace KirisameLib.Data.Register;
+﻿using System.Diagnostics;
 
-public class GettingDefaultValueFailedException(string message, Exception inner) : Exception(message, inner);
+namespace KirisameLib.Data.Register;
+
+public class GettingFallbackValueFailedException(string id, Exception inner) : Exception($"Failed to get fallback value for item: ID: {id}", inner);
