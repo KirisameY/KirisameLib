@@ -4,10 +4,13 @@ using KirisameLib.Data.Registers;
 
 namespace KirisameLib.Data.Registering;
 
-internal class PreFrozenProxyRegister<T> : IRegister<T>
+/// <summary>
+///     Internal class, used for <see cref="RegisterBuilder{TItem}"/>.
+/// </summary>
+internal class PreFrozenProxyRegister<TItem> : IRegister<TItem>
 {
     [field: AllowNull, MaybeNull]
-    internal IRegister<T> InnerRegister
+    internal IRegister<TItem> InnerRegister
     {
         get => field ?? throw new RegisterNotInitializedException();
         set
@@ -17,7 +20,7 @@ internal class PreFrozenProxyRegister<T> : IRegister<T>
         }
     }
 
-    public T GetItem(string id) => InnerRegister.GetItem(id);
+    public TItem GetItem(string id) => InnerRegister.GetItem(id);
 
     public bool ItemRegistered(string id) => InnerRegister.ItemRegistered(id);
 }

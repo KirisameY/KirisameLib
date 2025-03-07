@@ -1,10 +1,9 @@
-﻿using KirisameLib.Data.Register;
-using KirisameLib.Data.Registers;
+﻿using KirisameLib.Data.Registers;
 
 namespace KirisameLib.Data.Registering;
 
-public interface IRegistrant<T>
+public interface IRegistrant<TItem>
 {
-    void AcceptMoltenRegister(MoltenRegister<T> moltenRegister);
+    void AcceptMoltenRegister(MoltenRegister<TItem> moltenRegister);
     event Action RegisterDone;
 }

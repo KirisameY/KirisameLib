@@ -1,26 +1,47 @@
-﻿namespace KirisameLib.Data.Registers;
+﻿using KirisameLib.Data.Registering;
 
-public class MoltenRegister<T>(Func<string, T> fallback) : IRegister<T>
+namespace KirisameLib.Data.Registers;
+
+/// <summary>
+///     MoltenRegister, i.e. common register before freezing.<br/>
+///     Allows for registration &amp; alteration of items, and can be converted to a <see cref="FrozenRegister{TItem}"/>.<br/>
+///     It is recommended to use it as an intermediate object for creating a frozen registry.
+/// </summary>
+/// <param name="fallback"> Fallback function for items that are not registered </param>
+/// <remarks>
+///     Note that this register cannot be used after freezing.
+/// </remarks>
+/// <seealso cref="RegisterBuilder{TItem}"/>
+public class MoltenRegister<TItem>(Func<string, TItem> fallback) : IRegister<TItem>
 {
     private bool _frozen = false;
 
-    private readonly Dictionary<string, T> _regDict = new();
+    private readonly Dictionary<string, TItem> _regDict = new();
 
-    public bool AddItem(string id, T item)
+    /// <summary>
+    ///     Try to add an item to the register.
+    /// </summary>
+    /// <returns> Whether the item is added successfully. </returns>
+    /// <exception cref="RegisterAlreadyFrozenException"> Register is already frozen. </exception>
+    public bool AddItem(string id, TItem item)
     {
-        if (_frozen) throw new FrozenException();
+        if (_frozen) throw new RegisterAlreadyFrozenException();
         return _regDict.TryAdd(id, item);
     }
 
-    public void AddOrOverwriteItem(string id, T item)
+    /// <summary>
+    ///     Add an item to the register, if already exists, overwrite it.
+    /// </summary>
+    /// <exception cref="RegisterAlreadyFrozenException"> Register is already frozen. </exception>
+    public void AddOrOverwriteItem(string id, TItem item)
     {
-        if (_frozen) throw new FrozenException();
+        if (_frozen) throw new RegisterAlreadyFrozenException();
         _regDict[id] = item;
     }
 
-    public T GetItem(string id)
+    public TItem GetItem(string id)
     {
-        if (_frozen) throw new FrozenException();
+        if (_frozen) throw new RegisterAlreadyFrozenException();
         if (!_regDict.TryGetValue(id, out var value))
         {
             try { value = fallback(id); }
@@ -35,16 +56,28 @@ public class MoltenRegister<T>(Func<string, T> fallback) : IRegister<T>
 
     public bool ItemRegistered(string id)
     {
-        if (_frozen) throw new FrozenException();
+        if (_frozen) throw new RegisterAlreadyFrozenException();
         return _regDict.ContainsKey(id);
     }
 
-    public FrozenRegister<T> Frozen()
+
+    /// <summary>
+    ///     Freeze current molten register to a frozen register.
+    /// </summary>
+    /// <returns> The new FrozenRegister. </returns>
+    /// <exception cref="RegisterAlreadyFrozenException"> Register is already frozen. </exception>
+    /// <remarks>
+    ///     The frozen register will be a new instance, and after freezing this instance will no more available and will throw an exception when used<br/>
+    ///     Be sure to save the return value and discard this reference.
+    /// </remarks>
+    public FrozenRegister<TItem> Freeze()
     {
-        if (_frozen) throw new FrozenException();
+        if (_frozen) throw new RegisterAlreadyFrozenException();
         _frozen = true;
-        return new FrozenRegister<T>(_regDict, fallback);
+        return new FrozenRegister<TItem>(_regDict, fallback);
     }
 
-    public class FrozenException() : InvalidOperationException("Try to visit a frozen molten register.");
+
 }
+
+public class RegisterAlreadyFrozenException() : InvalidOperationException("Try to visit a frozen MoltenRegister.");
