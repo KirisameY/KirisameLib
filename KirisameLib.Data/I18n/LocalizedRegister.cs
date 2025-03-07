@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 
 using KirisameLib.Data.Register;
+using KirisameLib.Data.Registers;
 
 namespace KirisameLib.Data.I18n;
 

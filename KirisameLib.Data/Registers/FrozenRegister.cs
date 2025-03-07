@@ -1,12 +1,12 @@
-﻿namespace KirisameLib.Data.Register;
+﻿using System.Collections.Frozen;
 
-public class MoltenRegister<T>(Func<string, T> fallback) : IRegister<T>
+namespace KirisameLib.Data.Registers;
+
+public class FrozenRegister<T>(IDictionary<string, T> regDict, Func<string, T> fallback) : IRegister<T>
 {
-    private readonly Dictionary<string, T> _regDict = new();
+    private readonly FrozenDictionary<string, T> _regDict = regDict.ToFrozenDictionary();
 
-    public bool AddItem(string id, T item) => _regDict.TryAdd(id, item);
-
-    public void AddOrOverwriteItem(string id, T item) => _regDict[id] = item;
+    public T this[string id] => GetItem(id);
 
     public T GetItem(string id)
     {

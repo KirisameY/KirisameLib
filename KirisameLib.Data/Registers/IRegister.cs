@@ -1,4 +1,4 @@
-namespace KirisameLib.Data.Register;
+namespace KirisameLib.Data.Registers;
 
 public interface IRegister<T>
 {

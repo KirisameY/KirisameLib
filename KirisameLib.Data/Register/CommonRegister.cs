@@ -1,3 +1,5 @@
+using KirisameLib.Data.Registers;
+
 namespace KirisameLib.Data.Register;
 
 [Obsolete("Use MoltenRegister & FrozenRegister instead")]
