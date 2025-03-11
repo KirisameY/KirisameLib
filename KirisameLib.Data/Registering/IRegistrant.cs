@@ -8,5 +8,5 @@ namespace KirisameLib.Data.Registering;
 /// <seealso cref="RegisterBuilder{TItem}"/>
 public interface IRegistrant<TItem>
 {
-    void AcceptTarget(IRegTarget<TItem> moltenRegister);
+    void AcceptTarget(IRegTarget<TItem> target);
 }
