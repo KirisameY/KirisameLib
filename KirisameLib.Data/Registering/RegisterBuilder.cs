@@ -67,7 +67,7 @@ public class RegisterBuilder<TItem>
         _eventSource.RegisterDone += () => result.InnerRegister = molten.Freeze();
         foreach (var registrant in _registrants)
         {
-            registrant.AcceptMoltenRegister(molten);
+            registrant.AcceptTarget(molten);
         }
 
         return result;
