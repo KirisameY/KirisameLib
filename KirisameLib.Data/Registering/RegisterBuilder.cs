@@ -59,7 +59,7 @@ public class RegisterBuilder<TItem>
     /// </summary>
     /// <returns>The created register, will available after the event source raised RegisterDone event.</returns>
     /// <exception cref="InvalidOperationException"> Fallback or RegisterDoneEventSource is not set. </exception>
-    public IRegister<TItem> Build()
+    public IEnumerableRegister<TItem> Build()
     {
         if (_fallback is null) throw new InvalidOperationException("Fallback is not set.");
         if (_eventSource is null) throw new InvalidOperationException("RegisterDoneEventSource is not set.");
