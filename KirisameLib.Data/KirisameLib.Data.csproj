@@ -8,7 +8,7 @@
 
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.2.2</Version>
+        <Version>0.2.3</Version>
         <Title>KirisameLib.Data</Title>
         <Authors>KirisameY</Authors>
         <PackageProjectUrl>https://github.com/KirisameY/KirisameLib</PackageProjectUrl>

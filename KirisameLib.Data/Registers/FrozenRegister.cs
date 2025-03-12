@@ -1,4 +1,6 @@
-﻿using System.Collections.Frozen;
+﻿using System.Collections;
+using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 
 using KirisameLib.Data.Registering;
 
@@ -15,11 +17,14 @@ namespace KirisameLib.Data.Registers;
 /// <param name="fallback"> Fallback function for items that are not registered. </param>
 /// <seealso cref="MoltenRegister{TItem}"/>
 /// <seealso cref="RegisterBuilder{TItem}"/>
-public class FrozenRegister<TItem>(IDictionary<string, TItem> regDict, Func<string, TItem> fallback) : IRegister<TItem>
+public class FrozenRegister<TItem>(IDictionary<string, TItem> regDict, Func<string, TItem> fallback) : IEnumerableRegister<TItem>
 {
     private readonly FrozenDictionary<string, TItem> _regDict = regDict.ToFrozenDictionary();
 
     public TItem this[string id] => GetItem(id);
+    public IEnumerable<string> Keys => _regDict.Keys;
+    public IEnumerable<TItem> Values => _regDict.Values;
+    public int Count => _regDict.Count;
 
     public TItem GetItem(string id)
     {
@@ -36,4 +41,14 @@ public class FrozenRegister<TItem>(IDictionary<string, TItem> regDict, Func<stri
     }
 
     public bool ItemRegistered(string id) => _regDict.ContainsKey(id);
+
+    public bool TryGetValue(string key, out TItem value)
+    {
+        bool result = _regDict.TryGetValue(key, out var item);
+        value = result ? item! : fallback(key);
+        return result;
+    }
+
+    public IEnumerator<KeyValuePair<string, TItem>> GetEnumerator() => _regDict.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

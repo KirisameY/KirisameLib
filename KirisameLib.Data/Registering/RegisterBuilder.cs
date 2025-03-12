@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 using KirisameLib.Data.Registers;
 
 namespace KirisameLib.Data.Registering;
@@ -8,6 +10,7 @@ namespace KirisameLib.Data.Registering;
 ///     when the event source raised RegisterDone event and allow external access through the returned proxy object.
 /// </summary>
 /// <remarks> Both a fallback and an event source is necessary to build a register. </remarks>
+[PublicAPI]
 public class RegisterBuilder<TItem>
 {
     private Func<string, TItem>? _fallback;
