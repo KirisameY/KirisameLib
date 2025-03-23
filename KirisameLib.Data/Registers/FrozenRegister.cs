@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
 
 using KirisameLib.Data.Registering;
 
@@ -8,25 +7,25 @@ namespace KirisameLib.Data.Registers;
 
 /// <summary>
 ///     An immutable register.<br/>
-///     The most common implementation of <see cref="IRegister{TItem}"/>.
+///     The most common implementation of <see cref="IRegister{TKey, TItem}"/>.
 /// </summary>
 /// <param name="regDict">
 ///     Source dictionary that contains all registered id-item pairs.<br/>
 ///     Will not be stored in the new instance.
 /// </param>
 /// <param name="fallback"> Fallback function for items that are not registered. </param>
-/// <seealso cref="MoltenRegister{TItem}"/>
-/// <seealso cref="RegisterBuilder{TItem}"/>
-public class FrozenRegister<TItem>(IDictionary<string, TItem> regDict, Func<string, TItem> fallback) : IEnumerableRegister<TItem>
+/// <seealso cref="MoltenRegister{TKey, TItem}"/>
+/// <seealso cref="RegisterBuilder{TKey, TItem}"/>
+public class FrozenRegister<TKey, TItem>(IDictionary<TKey, TItem> regDict, Func<TKey, TItem> fallback) : IEnumerableRegister<TKey, TItem> where TKey : notnull
 {
-    private readonly FrozenDictionary<string, TItem> _regDict = regDict.ToFrozenDictionary();
+    private readonly FrozenDictionary<TKey, TItem> _regDict = regDict.ToFrozenDictionary();
 
-    public TItem this[string id] => GetItem(id);
-    public IEnumerable<string> Keys => _regDict.Keys;
+    public TItem this[TKey id] => GetItem(id);
+    public IEnumerable<TKey> Keys => _regDict.Keys;
     public IEnumerable<TItem> Values => _regDict.Values;
     public int Count => _regDict.Count;
 
-    public TItem GetItem(string id)
+    public TItem GetItem(TKey id)
     {
         if (!_regDict.TryGetValue(id, out var value))
         {
@@ -40,15 +39,15 @@ public class FrozenRegister<TItem>(IDictionary<string, TItem> regDict, Func<stri
         return value;
     }
 
-    public bool ItemRegistered(string id) => _regDict.ContainsKey(id);
+    public bool ItemRegistered(TKey id) => _regDict.ContainsKey(id);
 
-    public bool TryGetValue(string key, out TItem value)
+    public bool TryGetValue(TKey key, out TItem value)
     {
         bool result = _regDict.TryGetValue(key, out var item);
         value = result ? item! : fallback(key);
         return result;
     }
 
-    public IEnumerator<KeyValuePair<string, TItem>> GetEnumerator() => _regDict.GetEnumerator();
+    public IEnumerator<KeyValuePair<TKey, TItem>> GetEnumerator() => _regDict.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

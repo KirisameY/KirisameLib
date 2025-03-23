@@ -1,11 +1,10 @@
 ﻿namespace KirisameLib.Data.Registers;
 
-// ReSharper disable once PossibleInterfaceMemberAmbiguity
 /// <summary>
 ///     Readonly register interface that can be iterated as a dictionary.
 /// </summary>
-/// <typeparam name="TItem"></typeparam>
-public interface IEnumerableRegister<TItem> : IRegister<TItem>,IReadOnlyDictionary<string,TItem>
+public interface IEnumerableRegister<TKey, TItem> : IRegister<TKey, TItem>, IReadOnlyDictionary<TKey, TItem> where TKey : notnull
 {
-    bool IReadOnlyDictionary<string, TItem>.ContainsKey(string key) => ItemRegistered(key);
+    new TItem this[TKey key] { get; }
+    bool IReadOnlyDictionary<TKey, TItem>.ContainsKey(TKey key) => ItemRegistered(key);
 }

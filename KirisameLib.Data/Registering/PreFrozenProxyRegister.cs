@@ -6,12 +6,12 @@ using KirisameLib.Data.Registers;
 namespace KirisameLib.Data.Registering;
 
 /// <summary>
-///     Internal class, used for <see cref="RegisterBuilder{TItem}"/>.
+///     Internal class, used for <see cref="RegisterBuilder{TKey, TItem}"/>.
 /// </summary>
-internal class PreFrozenProxyRegister<TItem> : IEnumerableRegister<TItem>
+internal class PreFrozenProxyRegister<TKey, TItem> : IEnumerableRegister<TKey, TItem> where TKey : notnull
 {
     [field: AllowNull, MaybeNull]
-    internal IEnumerableRegister<TItem> InnerRegister
+    internal IEnumerableRegister<TKey, TItem> InnerRegister
     {
         get => field ?? throw new RegisterNotInitializedException();
         set
@@ -22,16 +22,16 @@ internal class PreFrozenProxyRegister<TItem> : IEnumerableRegister<TItem>
     }
 
 
-    public TItem this[string key] => InnerRegister[key];
-    public IEnumerable<string> Keys => InnerRegister.Keys;
+    public TItem this[TKey key] => InnerRegister[key];
+    public IEnumerable<TKey> Keys => InnerRegister.Keys;
     public IEnumerable<TItem> Values => InnerRegister.Values;
     public int Count => InnerRegister.Count;
 
-    public TItem GetItem(string id) => InnerRegister.GetItem(id);
-    public bool ItemRegistered(string id) => InnerRegister.ItemRegistered(id);
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out TItem value) => InnerRegister.TryGetValue(key, out value);
+    public TItem GetItem(TKey id) => InnerRegister.GetItem(id);
+    public bool ItemRegistered(TKey id) => InnerRegister.ItemRegistered(id);
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TItem value) => InnerRegister.TryGetValue(key, out value);
 
-    public IEnumerator<KeyValuePair<string, TItem>> GetEnumerator() => InnerRegister.GetEnumerator();
+    public IEnumerator<KeyValuePair<TKey, TItem>> GetEnumerator() => InnerRegister.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)InnerRegister).GetEnumerator();
 }
 

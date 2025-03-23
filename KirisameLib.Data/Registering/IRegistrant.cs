@@ -3,10 +3,10 @@
 namespace KirisameLib.Data.Registering;
 
 /// <summary>
-///     Interface for registering item into a <see cref="IRegTarget{TItem}"/>.
+///     Interface for registering item into a <see cref="IRegTarget{TKey, TItem}"/>.
 /// </summary>
-/// <seealso cref="RegisterBuilder{TItem}"/>
-public interface IRegistrant<TItem>
+/// <seealso cref="RegisterBuilder{TKey, TItem}"/>
+public interface IRegistrant<out TKey, out TItem> where TKey : notnull
 {
-    void AcceptTarget(IRegTarget<TItem> target);
+    void AcceptTarget(IRegTarget<TKey, TItem> target);
 }

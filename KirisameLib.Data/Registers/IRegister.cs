@@ -3,11 +3,13 @@ namespace KirisameLib.Data.Registers;
 /// <summary>
 ///     Readonly register interface.
 /// </summary>
+/// <typeparam name="TKey">Type of item id</typeparam>
 /// <typeparam name="TItem">Type of item to be registered</typeparam>
-public interface IRegister<out TItem>
+
+public interface IRegister<in TKey, out TItem> where TKey : notnull
 {
     //todo: 等待拓展类型
-    TItem this[string id] => GetItem(id);
+    TItem this[TKey id] { get; }
 
     /// <summary>
     ///     Get registered item by id.
@@ -16,10 +18,10 @@ public interface IRegister<out TItem>
     ///     Note that when implement this method, it should not throw exception when given id is not registered.
     ///     Instead, consider a default value or fallback delegate.
     /// </remarks>
-    TItem GetItem(string id);
+    TItem GetItem(TKey id);
 
     /// <summary>
     ///     Check if given id is registered.
     /// </summary>
-    bool ItemRegistered(string id);
+    bool ItemRegistered(TKey id);
 }

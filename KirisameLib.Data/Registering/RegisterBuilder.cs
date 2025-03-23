@@ -5,30 +5,30 @@ using KirisameLib.Data.Registers;
 namespace KirisameLib.Data.Registering;
 
 /// <summary>
-///     Builder for create an immutable <see cref="IRegister{TItem}"/>, which implemented by <see cref="FrozenRegister{TItem}"/> <br/>
-///     Work with <see cref="IRegistrant{TItem}"/> and <see cref="IRegisterDoneEventSource"/>, will freeze inner <see cref="MoltenRegister{TItem}"/>
+///     Builder for create an immutable <see cref="IRegister{TKey, TItem}"/>, which implemented by <see cref="FrozenRegister{TKey, TItem}"/> <br/>
+///     Work with <see cref="IRegistrant{TKey, TItem}"/> and <see cref="IRegisterDoneEventSource"/>, will freeze inner <see cref="MoltenRegister{TKey, TItem}"/>
 ///     when the event source raised RegisterDone event and allow external access through the returned proxy object.
 /// </summary>
 /// <remarks> Both a fallback and an event source is necessary to build a register. </remarks>
 [PublicAPI]
-public class RegisterBuilder<TItem>
+public class RegisterBuilder<TKey, TItem> where TKey : notnull
 {
-    private Func<string, TItem>? _fallback;
+    private Func<TKey, TItem>? _fallback;
     private IRegisterDoneEventSource? _eventSource;
 
-    private readonly HashSet<IRegistrant<TItem>> _registrants = [];
+    private readonly HashSet<IRegistrant<TKey, TItem>> _registrants = [];
 
     /// <summary>
     ///     Set a default item as fallback.<br/>
     ///     One of overloads of this method is necessary to build a register.
     /// </summary>
-    public RegisterBuilder<TItem> WithFallback(TItem fallback) => WithFallback(_ => fallback);
+    public RegisterBuilder<TKey, TItem> WithFallback(TItem fallback) => WithFallback(_ => fallback);
 
     /// <summary>
     ///     Set a fallback function for items that are not registered.<br/>
     ///     One of overloads of this method is necessary to build a register.
     /// </summary>
-    public RegisterBuilder<TItem> WithFallback(Func<string, TItem> fallback)
+    public RegisterBuilder<TKey, TItem> WithFallback(Func<TKey, TItem> fallback)
     {
         _fallback = fallback;
         return this;
@@ -39,7 +39,7 @@ public class RegisterBuilder<TItem>
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public RegisterBuilder<TItem> WithRegisterDoneEventSource(IRegisterDoneEventSource source)
+    public RegisterBuilder<TKey, TItem> WithRegisterDoneEventSource(IRegisterDoneEventSource source)
     {
         _eventSource = source;
         return this;
@@ -48,7 +48,7 @@ public class RegisterBuilder<TItem>
     /// <summary>
     ///     Add a registrant for registering.
     /// </summary>
-    public RegisterBuilder<TItem> AddRegistrant(IRegistrant<TItem> registrant)
+    public RegisterBuilder<TKey, TItem> AddRegistrant(IRegistrant<TKey, TItem> registrant)
     {
         _registrants.Add(registrant);
         return this;
@@ -59,13 +59,13 @@ public class RegisterBuilder<TItem>
     /// </summary>
     /// <returns>The created register, will available after the event source raised RegisterDone event.</returns>
     /// <exception cref="InvalidOperationException"> Fallback or RegisterDoneEventSource is not set. </exception>
-    public IEnumerableRegister<TItem> Build()
+    public IEnumerableRegister<TKey, TItem> Build()
     {
         if (_fallback is null) throw new InvalidOperationException("Fallback is not set.");
         if (_eventSource is null) throw new InvalidOperationException("RegisterDoneEventSource is not set.");
 
-        var result = new PreFrozenProxyRegister<TItem>();
-        var molten = new MoltenRegister<TItem>(_fallback);
+        var result = new PreFrozenProxyRegister<TKey, TItem>();
+        var molten = new MoltenRegister<TKey, TItem>(_fallback);
 
         _eventSource.RegisterDone += () => result.InnerRegister = molten.Freeze();
         foreach (var registrant in _registrants)
