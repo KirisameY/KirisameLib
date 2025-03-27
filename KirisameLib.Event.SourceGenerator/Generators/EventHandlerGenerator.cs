@@ -152,10 +152,9 @@ public class EventHandlerGenerator : IIncrementalGenerator
         sourceBuilder.AppendLine($"namespace {namespaceName};")
                      .AppendLine();
         sourceBuilder.AppendLine("#pragma warning disable CS1522 // Empty switch block")
-                     .AppendLine("#pragma warning disable CS0162 // Unreachable code detected")
-                     .Append("partial ");
+                     .AppendLine("#pragma warning disable CS0162 // Unreachable code detected");
         if (classInfo.Static) sourceBuilder.Append("static ");
-        sourceBuilder.AppendLine($"class {className}")
+        sourceBuilder.AppendLine($"partial class {className}")
                      .AppendLine("{");
         using (sourceBuilder.Indent())
         {
@@ -222,81 +221,84 @@ public class EventHandlerGenerator : IIncrementalGenerator
 
             #endregion
 
-            #region Instance Subscribe
-
-            sourceBuilder.AppendLine()
-                         .AppendLine(Global.GeneratedCodeAttribute)
-                         .Append((classInfo.Inherited, classInfo.Sealed) switch
-                          {
-                              (true, _)      => "protected override ",
-                              (false, false) => "protected virtual ",
-                              (false, true)  => "private ",
-                          })
-                         .AppendLine($"void SubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
-                         .AppendLine("{");
-            using (sourceBuilder.Indent())
+            if (!classInfo.Static)
             {
-                sourceBuilder.AppendLine("switch (group)")
-                             .AppendLine("{")
-                             .IncreaseIndent();
-                foreach (var (group, handlers) in classInfo.InstanceEventHandlers)
+                #region Instance Subscribe
+
+                sourceBuilder.AppendLine()
+                             .AppendLine(Global.GeneratedCodeAttribute)
+                             .Append((classInfo.Inherited, classInfo.Sealed) switch
+                              {
+                                  (true, _)      => "protected override ",
+                                  (false, false) => "protected virtual ",
+                                  (false, true)  => "private ",
+                              })
+                             .AppendLine($"void SubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
+                             .AppendLine("{");
+                using (sourceBuilder.Indent())
                 {
-                    sourceBuilder.AppendLine($"case \"{group}\":");
-                    using (sourceBuilder.Indent())
+                    sourceBuilder.AppendLine("switch (group)")
+                                 .AppendLine("{")
+                                 .IncreaseIndent();
+                    foreach (var (group, handlers) in classInfo.InstanceEventHandlers)
                     {
-                        foreach (var (methodName, eventType, flagsValue) in handlers)
+                        sourceBuilder.AppendLine($"case \"{group}\":");
+                        using (sourceBuilder.Indent())
                         {
-                            sourceBuilder.AppendLine
-                                ($"bus.Subscribe<global::{eventType}>({methodName}, (global::{Names.HandlerSubscribeFlag}){flagsValue});");
+                            foreach (var (methodName, eventType, flagsValue) in handlers)
+                            {
+                                sourceBuilder.AppendLine
+                                    ($"bus.Subscribe<global::{eventType}>({methodName}, (global::{Names.HandlerSubscribeFlag}){flagsValue});");
+                            }
+                            sourceBuilder.AppendLine("break;");
                         }
-                        sourceBuilder.AppendLine("break;");
                     }
+                    sourceBuilder.DecreaseIndent()
+                                 .AppendLine("}");
+                    if (classInfo.Inherited) sourceBuilder.AppendLine("base.SubscribeInstanceHandler(bus, group);");
                 }
-                sourceBuilder.DecreaseIndent()
-                             .AppendLine("}");
-                if (classInfo.Inherited) sourceBuilder.AppendLine("base.SubscribeInstanceHandler(bus, group);");
-            }
-            sourceBuilder.AppendLine("}");
+                sourceBuilder.AppendLine("}");
 
-            #endregion
+                #endregion
 
-            #region Instance Unsubscribe
+                #region Instance Unsubscribe
 
-            sourceBuilder.AppendLine()
-                         .AppendLine(Global.GeneratedCodeAttribute)
-                         .Append((classInfo.Inherited, classInfo.Sealed) switch
-                          {
-                              (true, _)      => "protected override ",
-                              (false, false) => "protected virtual ",
-                              (false, true)  => "private ",
-                          })
-                         .AppendLine($"void UnsubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
-                         .AppendLine("{");
-            using (sourceBuilder.Indent())
-            {
-                sourceBuilder.AppendLine("switch (group)")
-                             .AppendLine("{")
-                             .IncreaseIndent();
-                foreach (var (group, handlers) in classInfo.InstanceEventHandlers)
+                sourceBuilder.AppendLine()
+                             .AppendLine(Global.GeneratedCodeAttribute)
+                             .Append((classInfo.Inherited, classInfo.Sealed) switch
+                              {
+                                  (true, _)      => "protected override ",
+                                  (false, false) => "protected virtual ",
+                                  (false, true)  => "private ",
+                              })
+                             .AppendLine($"void UnsubscribeInstanceHandler(global::{Names.EventBus} bus, string group = \"\")")
+                             .AppendLine("{");
+                using (sourceBuilder.Indent())
                 {
-                    sourceBuilder.AppendLine($"case \"{group}\":");
-                    using (sourceBuilder.Indent())
+                    sourceBuilder.AppendLine("switch (group)")
+                                 .AppendLine("{")
+                                 .IncreaseIndent();
+                    foreach (var (group, handlers) in classInfo.InstanceEventHandlers)
                     {
-                        foreach (var (methodName, eventType, _) in handlers)
+                        sourceBuilder.AppendLine($"case \"{group}\":");
+                        using (sourceBuilder.Indent())
                         {
-                            sourceBuilder.AppendLine
-                                ($"bus.Unsubscribe<global::{eventType}>({methodName});");
+                            foreach (var (methodName, eventType, _) in handlers)
+                            {
+                                sourceBuilder.AppendLine
+                                    ($"bus.Unsubscribe<global::{eventType}>({methodName});");
+                            }
+                            sourceBuilder.AppendLine("break;");
                         }
-                        sourceBuilder.AppendLine("break;");
                     }
+                    sourceBuilder.DecreaseIndent()
+                                 .AppendLine("}");
+                    if (classInfo.Inherited) sourceBuilder.AppendLine("base.UnsubscribeInstanceHandler(bus, group);");
                 }
-                sourceBuilder.DecreaseIndent()
-                             .AppendLine("}");
-                if (classInfo.Inherited) sourceBuilder.AppendLine("base.UnsubscribeInstanceHandler(bus, group);");
-            }
-            sourceBuilder.AppendLine("}");
+                sourceBuilder.AppendLine("}");
 
-            #endregion
+                #endregion
+            }
         }
         sourceBuilder.AppendLine("}");
 
