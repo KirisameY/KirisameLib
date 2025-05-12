@@ -37,6 +37,12 @@ public static class EnumerableExtensions
     public static IEnumerable<TResult> SelectExist<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector) =>
         source.Select(selector).OfType<TResult>();
 
+    public static IEnumerable<T> SelectSelf<T>(this IEnumerable<T> source, Action<T> selector) => source.Select(e =>
+    {
+        selector(e);
+        return e;
+    });
+
 
     //dual
     public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
