@@ -34,6 +34,7 @@ public static class EnumerableExtensions
 
     public static int PositionOfFirst<T>(this IEnumerable<T> source, T target) => PositionOfFirst(source, item => Equals(item, target));
 
+    [Pure]
     public static IEnumerable<TResult> SelectExist<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult?> selector) =>
         source.Select(selector).OfType<TResult>();
 
@@ -45,9 +46,11 @@ public static class EnumerableExtensions
 
 
     //dual
+    [Pure]
     public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
         CrossJoin(first, second, (x, y) => (x, y));
 
+    [Pure]
     public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>
         (this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) =>
         from x in first
@@ -56,8 +59,10 @@ public static class EnumerableExtensions
 
 
     //multi
+    [Pure]
     public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source) =>
         source.SelectMany(x => x);
 
+    [Pure]
     public static IEnumerable<T> Flatten<T>(params IEnumerable<T>[] source) => source.Flatten();
 }
