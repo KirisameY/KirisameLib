@@ -1,4 +1,6 @@
-﻿namespace KirisameLib.Extensions;
+﻿using System.Diagnostics.Contracts;
+
+namespace KirisameLib.Extensions;
 
 public static class EnumerableExtensions
 {
@@ -44,6 +46,47 @@ public static class EnumerableExtensions
         return e;
     });
 
+    [Pure]
+    public static IEnumerable<T> SelectAggregate<T>(this IEnumerable<T> source, Func<T, T, T> aggregator)
+    {
+        using var enumerator = source.GetEnumerator();
+
+        if (!enumerator.MoveNext()) yield break;
+        var working = enumerator.Current;
+        yield return working;
+
+        while (enumerator.MoveNext())
+        {
+            working = aggregator(working, enumerator.Current);
+            yield return working;
+        }
+    }
+
+    [Pure]
+    public static IEnumerable<TAccumulate> SelectAggregate<TSource, TAccumulate>(
+        this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> aggregator)
+    {
+        var working = seed;
+        foreach (var current in source)
+        {
+            working = aggregator(working, current);
+            yield return working;
+        }
+    }
+
+    [Pure]
+    public static IEnumerable<TResult> SelectAggregate<TSource, TAccumulate, TResult>(
+        this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> aggregator,
+        Func<TAccumulate, TResult> resultSelector)
+    {
+        var working = seed;
+        foreach (var current in source)
+        {
+            working = aggregator(working, current);
+            yield return resultSelector(working);
+        }
+    }
+
 
     //dual
     [Pure]
@@ -51,8 +94,8 @@ public static class EnumerableExtensions
         CrossJoin(first, second, (x, y) => (x, y));
 
     [Pure]
-    public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>
-        (this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) =>
+    public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
+        this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) =>
         from x in first
         from y in second
         select resultSelector(x, y);
