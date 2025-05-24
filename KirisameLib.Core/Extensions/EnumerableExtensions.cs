@@ -87,6 +87,22 @@ public static class EnumerableExtensions
         }
     }
 
+    public delegate bool WhileSelector<TSource, TResult>(ref TSource item, out TResult result);
+
+    [Pure]
+    public static IEnumerable<TResult> SelectWhile<TSource, TResult>(this TSource source, WhileSelector<TSource, TResult> selector)
+    {
+        while (selector(ref source, out var result)) yield return result;
+    }
+
+    [Pure]
+    public static IEnumerable<TResult> SelectWhile<TSource, TResult>(this TSource source, Func<TSource, bool> condition, Func<TSource, TResult> selector)
+    {
+        while (condition(source))
+        {
+            yield return selector(source);
+        }
+    }
 
     //dual
     [Pure]
