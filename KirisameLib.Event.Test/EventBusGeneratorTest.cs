@@ -5,7 +5,7 @@ public class EventBusGeneratorTest
     [Test]
     public void InstanceTest()
     {
-        EventBus bus = new ImmediateEventBus();
+        EventBus bus = new ImmediateEventBus((_, ex) => Console.WriteLine(ex));
         List<string> baseReceived = [];
         List<string> inheritedReceived = [];
 

@@ -15,6 +15,8 @@ public class EventHandlerGenerator : IIncrementalGenerator
 {
     private static class Names
     {
+        public const string Task = "System.Threading.Tasks.Task";
+
         public const string EventHandlerContainerAttribute = "KirisameLib.Event.EventHandlerContainerAttribute";
         public const string EventHandlerAttribute = "KirisameLib.Event.EventHandlerAttribute";
 
@@ -45,7 +47,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
 
     #region SelectClassInfo
 
-    private record struct EventHandlerInfo(string MethodName, string EventType, int FlagsValue);
+    private record struct EventHandlerInfo(string MethodName, string EventType, int FlagsValue, bool IsAsync);
 
     private record struct EventContainerClassInfo(
         INamedTypeSymbol ClassSymbol,
@@ -88,8 +90,8 @@ public class EventHandlerGenerator : IIncrementalGenerator
 
         foreach (var method in classSymbol.GetMembers().OfType<IMethodSymbol>())
         {
-            if (method.IsOverride) continue;   //do not consider inherited method
-            if (!method.ReturnsVoid) continue; //should be void return type
+            if (method.IsOverride) continue;                                                        //do not consider inherited method
+            if (!method.ReturnsVoid && method.ReturnType.ToDisplayString() != Names.Task) continue; //should be void return type
             //should have single event parameter
             if (method.Parameters is not [{ Type: INamedTypeSymbol paramType }] || !paramType.IsDerivedFrom(Names.BaseEvent)) continue;
 
@@ -99,6 +101,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
                 var targetDict = method.IsStatic ? staticHandlers : instanceHandlers;
                 var handlerName = method.Name;
                 var eventType = paramType.ToDisplayString();
+                var isAsync = !method.ReturnsVoid;
 
                 if (attribute.ConstructorArguments is not [{ Values: var groupArg }, { Value: int flagsArg }])
                     throw new InvalidOperationException();
@@ -110,7 +113,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
                 foreach (var group in groups)
                 {
                     if (!targetDict.TryGetValue(group, out var list)) targetDict[group] = list = [];
-                    list.Add(new(handlerName, eventType, flagsValue));
+                    list.Add(new(handlerName, eventType, flagsValue, isAsync));
                 }
                 break;
             }
@@ -174,10 +177,11 @@ public class EventHandlerGenerator : IIncrementalGenerator
                     sourceBuilder.AppendLine($"case \"{group}\":");
                     using (sourceBuilder.Indent())
                     {
-                        foreach (var (methodName, eventType, flagsValue) in handlers)
+                        foreach (var (methodName, eventType, flagsValue, isAsync) in handlers)
                         {
                             sourceBuilder.AppendLine
-                                ($"bus.Subscribe<global::{eventType}>({methodName}, (global::{Names.HandlerSubscribeFlag}){flagsValue});");
+                            ($"bus.{(isAsync ? "SubscribeAsync" : "Subscribe")}<global::{eventType}>({methodName}, "
+                           + $"(global::{Names.HandlerSubscribeFlag}){flagsValue});");
                         }
                         sourceBuilder.AppendLine("break;");
                     }
@@ -206,10 +210,9 @@ public class EventHandlerGenerator : IIncrementalGenerator
                     sourceBuilder.AppendLine($"case \"{group}\":");
                     using (sourceBuilder.Indent())
                     {
-                        foreach (var (methodName, eventType, _) in handlers)
+                        foreach (var (methodName, eventType, _, _) in handlers)
                         {
-                            sourceBuilder.AppendLine
-                                ($"bus.Unsubscribe<global::{eventType}>({methodName});");
+                            sourceBuilder.AppendLine($"bus.Unsubscribe<global::{eventType}>({methodName});");
                         }
                         sourceBuilder.AppendLine("break;");
                     }
@@ -245,10 +248,11 @@ public class EventHandlerGenerator : IIncrementalGenerator
                         sourceBuilder.AppendLine($"case \"{group}\":");
                         using (sourceBuilder.Indent())
                         {
-                            foreach (var (methodName, eventType, flagsValue) in handlers)
+                            foreach (var (methodName, eventType, flagsValue, isAsync) in handlers)
                             {
                                 sourceBuilder.AppendLine
-                                    ($"bus.Subscribe<global::{eventType}>({methodName}, (global::{Names.HandlerSubscribeFlag}){flagsValue});");
+                                ($"bus.{(isAsync ? "SubscribeAsync" : "Subscribe")}<global::{eventType}>({methodName}, "
+                               + $"(global::{Names.HandlerSubscribeFlag}){flagsValue});");
                             }
                             sourceBuilder.AppendLine("break;");
                         }
@@ -283,7 +287,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
                         sourceBuilder.AppendLine($"case \"{group}\":");
                         using (sourceBuilder.Indent())
                         {
-                            foreach (var (methodName, eventType, _) in handlers)
+                            foreach (var (methodName, eventType, _, _) in handlers)
                             {
                                 sourceBuilder.AppendLine
                                     ($"bus.Unsubscribe<global::{eventType}>({methodName});");

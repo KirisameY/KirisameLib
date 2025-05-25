@@ -1,6 +1,6 @@
 namespace KirisameLib.Event;
 
-public sealed class ImmediateEventBus : EventBus
+public sealed class ImmediateEventBus(Action<BaseEvent, Exception> exceptionHandler) : EventBus(exceptionHandler)
 {
     private bool _handlingEvent = false;
 
@@ -10,7 +10,7 @@ public sealed class ImmediateEventBus : EventBus
 
         //handle event queue
         _handlingEvent = true;
-        List<EventHandlingException> exceptions = [];
+        List<EventSendingException> exceptions = [];
 
         while (NotifyQueue.TryDequeue(out var notifyAction))
         {
@@ -18,7 +18,7 @@ public sealed class ImmediateEventBus : EventBus
             {
                 notifyAction.Invoke();
             }
-            catch (EventHandlingException e)
+            catch (EventSendingException e)
             {
                 exceptions.Add(e);
             }

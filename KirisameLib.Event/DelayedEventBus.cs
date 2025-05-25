@@ -1,6 +1,6 @@
 ﻿namespace KirisameLib.Event;
 
-public sealed class DelayedEventBus : EventBus
+public sealed class DelayedEventBus(Action<BaseEvent, Exception> exceptionHandler) : EventBus(exceptionHandler)
 {
     private bool _handlingEvent = false;
     private readonly Queue<Action> _subNotifyQueue = [];
@@ -19,7 +19,7 @@ public sealed class DelayedEventBus : EventBus
 
         //handle main event queue
         _handlingEvent = true;
-        List<EventHandlingException> exceptions = [];
+        List<EventSendingException> exceptions = [];
 
         while (NotifyQueue.TryDequeue(out var notifyAction))
         {
@@ -41,7 +41,7 @@ public sealed class DelayedEventBus : EventBus
             {
                 notify.Invoke();
             }
-            catch (EventHandlingException e)
+            catch (EventSendingException e)
             {
                 exceptions.Add(e);
             }

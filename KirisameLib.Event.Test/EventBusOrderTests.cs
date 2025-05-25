@@ -54,9 +54,9 @@ public class EventBusOrderTests
         string GetEcho(string msg) => $"- I got a msg: \"{msg}\"!";
     }
 
-    [Test] public void ImmediateAwaitOrderTest() => AwaitOrderTest(new ImmediateEventBus());
+    [Test] public void ImmediateAwaitOrderTest() => AwaitOrderTest(new ImmediateEventBus((_, ex) => Console.WriteLine(ex)));
 
-    [Test] public void DelayedAwaitOrderTest() => AwaitOrderTest(new DelayedEventBus());
+    [Test] public void DelayedAwaitOrderTest() => AwaitOrderTest(new DelayedEventBus((_, ex) => Console.WriteLine(ex)));
 
     private static void ChainedOrderTest(EventBus bus)
     {
@@ -112,7 +112,7 @@ public class EventBusOrderTests
         });
     }
 
-    [Test] public void ImmediateChainedOrderTest() => ChainedOrderTest(new ImmediateEventBus());
+    [Test] public void ImmediateChainedOrderTest() => ChainedOrderTest(new ImmediateEventBus((_, ex) => Console.WriteLine(ex)));
 
-    [Test] public void DelayedChainedOrderTest() => ChainedOrderTest(new DelayedEventBus());
+    [Test] public void DelayedChainedOrderTest() => ChainedOrderTest(new DelayedEventBus((_, ex) => Console.WriteLine(ex)));
 }
