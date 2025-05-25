@@ -55,13 +55,12 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
 
     private void EmitEvent<TEvent>(TEvent @event) where TEvent : BaseEvent
     {
-        var type = typeof(TEvent);
         List<Exception> exceptions = [];
 
         //遍历Event类型基类直至BaseEvent(其基类是object)
-        while (type != typeof(object))
+        for (var type = typeof(TEvent); type != typeof(object); type = type!.BaseType)
         {
-            if (!_handlersDict.TryGetValue(type!, out var handlerInfos)) goto next;
+            if (!_handlersDict.TryGetValue(type!, out var handlerInfos)) continue;
 
             //监听者产生的异常集中处理
             foreach (var handler in handlerInfos.Handlers.Select(h => h.handler))
@@ -85,9 +84,6 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
             //移除一次性Handlers
             handlerInfos.OneTimeHandlers.ForEach(h => handlerInfos.Handlers.RemoveAll(h1 => h1.handler == h));
             handlerInfos.OneTimeHandlers.Clear();
-
-        next:
-            type = type!.BaseType;
         }
 
         if (exceptions.Count > 0) throw new EventSendingException(exceptions, @event);
