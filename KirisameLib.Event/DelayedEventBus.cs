@@ -32,7 +32,7 @@ public sealed class DelayedEventBus(Action<BaseEvent, Exception> exceptionHandle
         }
         _handlingEvent = false;
 
-        if (exceptions.Count > 0) throw new QueueEventHandlingException(exceptions);
+        if (exceptions.Count > 0) throw new QueueEventSendingException(exceptions);
         return;
 
         void InvokeAndCatch(Action notify)

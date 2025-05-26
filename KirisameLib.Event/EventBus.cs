@@ -53,9 +53,10 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
     }
 
 
-    private void EmitEvent<TEvent>(TEvent @event) where TEvent : BaseEvent
+    private void EmitEvent<TEvent>(TEvent @event, Action? continueAction = null) where TEvent : BaseEvent
     {
         List<Exception> exceptions = [];
+        List<Task> tasks = [];
 
         //遍历Event类型基类直至BaseEvent(其基类是object)
         for (var type = typeof(TEvent); type != typeof(object); type = type!.BaseType)
@@ -67,13 +68,13 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
             {
                 try
                 {
-                    var handlerDelegate = handler as Func<TEvent, Task>;
-                    var result = handlerDelegate?.Invoke(@event);
-                    result?.ContinueWith(t =>
+                    var handlerDelegate = (Func<TEvent, Task>)handler;
+                    var result = handlerDelegate.Invoke(@event);
+                    result.ContinueWith(t =>
                     {
-                        if (!t.IsFaulted) return;
-                        exceptionHandler.Invoke(@event, t.Exception);
-                    });
+                        if (t.IsFaulted) exceptionHandler.Invoke(@event, t.Exception);
+                    }, TaskScheduler.Current);
+                    tasks.Add(result);
                 }
                 catch (Exception e)
                 {
@@ -85,6 +86,12 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
             handlerInfos.OneTimeHandlers.ForEach(h => handlerInfos.Handlers.RemoveAll(h1 => h1.handler == h));
             handlerInfos.OneTimeHandlers.Clear();
         }
+
+        Task.WhenAll(tasks).ContinueWith(_ =>
+        {
+            try { continueAction?.Invoke(); }
+            catch (Exception e) { exceptionHandler.Invoke(@event, e); }
+        }, TaskScheduler.Current);
 
         if (exceptions.Count > 0) throw new EventSendingException(exceptions, @event);
     }
@@ -106,11 +113,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
     {
         return new(@event, task =>
         {
-            NotifyEnqueue(() =>
-            {
-                EmitEvent(task.Event);
-                task.Complete();
-            });
+            NotifyEnqueue(() => EmitEvent(task.Event, task.Complete));
             EventReceived();
         });
     }

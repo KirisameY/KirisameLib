@@ -25,6 +25,6 @@ public sealed class ImmediateEventBus(Action<BaseEvent, Exception> exceptionHand
         }
         _handlingEvent = false;
 
-        if (exceptions.Count > 0) throw new QueueEventHandlingException(exceptions);
+        if (exceptions.Count > 0) throw new QueueEventSendingException(exceptions);
     }
 }

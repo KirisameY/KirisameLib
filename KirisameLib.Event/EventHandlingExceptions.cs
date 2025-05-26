@@ -9,7 +9,7 @@ public class EventSendingException(IEnumerable<Exception> innerExceptions, BaseE
     public override string ToString() => $"FromEvent:{FromEvent}, {base.ToString()}";
 }
 
-public class QueueEventHandlingException(IEnumerable<EventSendingException> innerExceptions) : AggregateException(innerExceptions)
+public class QueueEventSendingException(IEnumerable<EventSendingException> innerExceptions) : AggregateException(innerExceptions)
 {
     [field: AllowNull, MaybeNull]
     public ReadOnlyCollection<EventSendingException> EventHandlingExceptions => field ??= new(innerExceptions.ToList());
