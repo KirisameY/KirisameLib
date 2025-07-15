@@ -6,7 +6,7 @@ public class EventTask<TEvent> where TEvent : BaseEvent
 {
     internal EventTask(TEvent @event, Action<EventTask<TEvent>> readyAction)
     {
-        Event = @event;
+        Event        = @event;
         _readyAction = readyAction;
     }
 
@@ -48,20 +48,6 @@ public class EventTask<TEvent> where TEvent : BaseEvent
         IsReady = true;
         _readyAction.Invoke(this);
     }
-}
 
-public readonly struct EventAwaiter<TEvent> : INotifyCompletion where TEvent : BaseEvent
-{
-    internal EventAwaiter(EventTask<TEvent> task)
-    {
-        _task = task;
-    }
-
-    private readonly EventTask<TEvent> _task;
-
-    public TEvent GetResult() => IsCompleted ? _task.Event : throw new InvalidOperationException("Event is not completed.");
-
-    public bool IsCompleted => _task.IsCompleted;
-
-    public void OnCompleted(Action continuation) => _task.ContinueWith(continuation).Ready();
+    public ConfiguredEventAwaitable<TEvent> ConfigureAwait(bool continueOnCapturedContext) => new(this, continueOnCapturedContext);
 }
