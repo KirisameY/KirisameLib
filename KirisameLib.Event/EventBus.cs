@@ -1,4 +1,8 @@
-﻿namespace KirisameLib.Event;
+﻿using System.Collections.Immutable;
+
+using KirisameLib.Extensions;
+
+namespace KirisameLib.Event;
 
 public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
 {
@@ -27,7 +31,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
             _handlersDict[typeof(TEvent)] = handlerInfos = new();
 
-        handlerInfos.Handlers.Add((handler, source));
+        handlerInfos.Handlers = handlerInfos.Handlers.Add((handler, source));
         //record only once handlers
         if (flags.HasFlag(HandlerSubscribeFlag.OnlyOnce)) handlerInfos.OneTimeHandlers.Add(handler);
         return () => Unsubscribe(handler);
@@ -40,7 +44,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
             _handlersDict[typeof(TEvent)] = handlerInfos = new();
 
-        handlerInfos.Handlers.RemoveAll(h => ReferenceEquals(h.source, handler));
+        handlerInfos.Handlers = handlerInfos.Handlers.RemoveAll(h => ReferenceEquals(h.source, handler));
     }
 
     public void Unsubscribe<TEvent>(Func<TEvent, Task> handler)
@@ -49,7 +53,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
             _handlersDict[typeof(TEvent)] = handlerInfos = new();
 
-        handlerInfos.Handlers.RemoveAll(h => ReferenceEquals(h.handler, handler));
+        handlerInfos.Handlers = handlerInfos.Handlers.RemoveAll(h => ReferenceEquals(h.handler, handler));
     }
 
 
@@ -58,12 +62,16 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         List<Exception> exceptions = [];
         List<Task> tasks = [];
 
-        //遍历Event类型基类直至BaseEvent(其基类是object)
+        // 遍历Event类型基类直至BaseEvent(其基类是object)
         for (var type = typeof(TEvent); type != typeof(object); type = type!.BaseType)
         {
             if (!_handlersDict.TryGetValue(type!, out var handlerInfos)) continue;
 
-            //监听者产生的异常集中处理
+            // 记录并清空当前一次性handlers
+            var oneTimeHandlers = handlerInfos.OneTimeHandlers.ToArray();
+            handlerInfos.OneTimeHandlers.Clear();
+
+            // 监听者产生的异常集中处理
             foreach (var handler in handlerInfos.Handlers.Select(h => h.handler))
             {
                 try
@@ -82,9 +90,11 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
                 }
             }
 
-            //移除一次性Handlers
-            handlerInfos.OneTimeHandlers.ForEach(h => handlerInfos.Handlers.RemoveAll(h1 => h1.handler == h));
-            handlerInfos.OneTimeHandlers.Clear();
+            // 移除一次性Handlers
+            oneTimeHandlers.ForEach(h =>
+            {
+                handlerInfos.Handlers = handlerInfos.Handlers.RemoveAll(h1 => ReferenceEquals(h1.handler, h));
+            });
         }
 
         Task.WhenAll(tasks).ContinueWith(_ =>
@@ -121,7 +131,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
 
     private class HandlerInfos
     {
-        public List<(Delegate handler, Delegate? source)> Handlers { get; } = [];
+        public ImmutableList<(Delegate handler, Delegate? source)> Handlers { get; set; } = [];
         public List<Delegate> OneTimeHandlers { get; } = [];
     }
 }
