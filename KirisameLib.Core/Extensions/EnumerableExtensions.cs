@@ -104,6 +104,12 @@ public static class EnumerableExtensions
         }
     }
 
+    [Pure]
+    public static bool ContainsAny<T>(this IEnumerable<T> source, IEnumerable<T> items) => items.Any(source.Contains);
+
+    [Pure]
+    public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> items) => items.All(source.Contains);
+
     //dual
     [Pure]
     public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
