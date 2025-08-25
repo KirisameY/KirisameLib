@@ -110,6 +110,14 @@ public static class EnumerableExtensions
     [Pure]
     public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> items) => items.All(source.Contains);
 
+    [Pure]
+    public static IEnumerable<int> FindAll<T>(this IEnumerable<T> source, T find) =>
+        source.Index().Where(t => Equals(t.Item, find)).Select(t => t.Index);
+
+    [Pure]
+    public static IEnumerable<int> FindAll<T>(this IEnumerable<T> source, Func<T, bool> predicate) =>
+        source.Index().Where(t => predicate(t.Item)).Select(t => t.Index);
+
     //dual
     [Pure]
     public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second) =>
