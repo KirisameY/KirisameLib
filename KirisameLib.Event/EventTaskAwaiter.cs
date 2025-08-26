@@ -39,8 +39,14 @@ public readonly struct EventAwaiter<TEvent> : INotifyCompletion where TEvent : B
 
         _task.ContinueWith(() =>
         {
-            if (context is not null) context.Post(_ => continuation.Invoke(), null);
+            if (context is not null)
+            {
+                if (context == SynchronizationContext.Current) continuation.Invoke();
+                else context.Post(_ => continuation.Invoke(), null);
+            }
             else continuation.Invoke();
-        }).Ready();
+        });
+
+        _task.Ready();
     }
 }

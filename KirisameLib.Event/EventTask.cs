@@ -11,6 +11,7 @@ public class EventTask<TEvent> where TEvent : BaseEvent
     private readonly Action<EventTask<TEvent>> _readyAction;
     private Action? _continueAction;
 
+    private readonly Lock _lock = new();
     public bool IsReady { get; private set; } = false;
     public bool IsCompleted { get; private set; } = false;
 
@@ -19,24 +20,45 @@ public class EventTask<TEvent> where TEvent : BaseEvent
 
     internal void Complete()
     {
-        IsCompleted = true;
-        _continueAction?.Invoke();
+        Action? actionToInvoke;
+
+        lock (_lock)
+        {
+            if (IsCompleted) return;
+            IsCompleted    = true;
+            actionToInvoke = _continueAction;
+        }
+
+        actionToInvoke?.Invoke();
     }
 
     public EventAwaiter<TEvent> GetAwaiter() => new(this);
 
     public EventTask<TEvent> ContinueWith(Action continuation)
     {
-        if (IsCompleted) continuation.Invoke();
-        else _continueAction += continuation;
+        bool completed = false;
+        lock (_lock)
+        {
+            if (IsCompleted) completed =  true;
+            else _continueAction       += continuation;
+        }
+
+        if (completed) continuation.Invoke();
         return this;
     }
 
     public EventTask<TEvent> ContinueWith(Action<TEvent> continuation)
     {
         var action = () => continuation.Invoke(Event);
-        if (IsCompleted) action.Invoke();
-        else _continueAction += action;
+
+        bool completed = false;
+        lock (_lock)
+        {
+            if (IsCompleted) completed =  true;
+            else _continueAction       += action;
+        }
+
+        if (completed) action.Invoke();
         return this;
     }
 
