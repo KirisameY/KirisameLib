@@ -5,7 +5,7 @@ namespace KirisameLib.Event;
 
 public readonly struct ConfiguredEventAwaitable<TEvent> where TEvent : BaseEvent
 {
-    internal ConfiguredEventAwaitable(EventTask<TEvent> task, bool contextRestore = false)
+    internal ConfiguredEventAwaitable(EventTask<TEvent> task, bool contextRestore)
     {
         _task           = task;
         _contextRestore = contextRestore;

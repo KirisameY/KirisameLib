@@ -80,8 +80,8 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
                     var result = handlerDelegate.Invoke(@event);
                     result.ContinueWith(t =>
                     {
-                        if (t.IsFaulted) exceptionHandler.Invoke(@event, t.Exception);
-                    }, TaskScheduler.Current);
+                        exceptionHandler.Invoke(@event, t.Exception!.Flatten());
+                    }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current);
                     tasks.Add(result);
                 }
                 catch (Exception e)
@@ -101,7 +101,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         {
             try { continueAction?.Invoke(); }
             catch (Exception e) { exceptionHandler.Invoke(@event, e); }
-        }, TaskScheduler.Current);
+        }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Current);
 
         if (exceptions.Count > 0) throw new EventSendingException(exceptions, @event);
     }

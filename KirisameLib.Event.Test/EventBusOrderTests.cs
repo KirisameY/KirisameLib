@@ -22,17 +22,19 @@ public class EventBusOrderTests
 
         bus.Publish(new SendEvent("Hello World!"));
 
-        ((Func<Task>?)(async () =>
+        var task = ((Func<Task>)(async () =>
         {
-            await bus.PublishAndWaitFor(new SendEvent("And I send this first"));
+            await bus.PublishAndWaitFor(new SendEvent("And I send this first")).ConfigureAwait(false);
             bus.Publish(new SendEvent("and this 2nd"));
             received.Add("and put this stealthily 3rd");
             Console.WriteLine("and put this stealthily 3rd");
-        }))?.Invoke();
+        })).Invoke();
 
         bus.Publish(new SendEvent("Now I'm done"));
 
         if (bus is DelayedEventBus delayedBus) delayedBus.HandleEvent(); //todo: 炸了>_<
+
+        task.Wait();
 
         string[] expected =
         [
