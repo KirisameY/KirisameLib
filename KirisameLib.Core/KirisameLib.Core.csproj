@@ -9,7 +9,7 @@
         
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.1.7</Version>
+        <Version>0.1.8</Version>
         <Title>KirisameLib.Core</Title>
         <Authors>KirisameY</Authors>
         <PackageProjectUrl>https://github.com/KirisameY/KirisameLib</PackageProjectUrl>
@@ -20,10 +20,6 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2023.3.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Events\" />
     </ItemGroup>
 
 </Project>
