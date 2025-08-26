@@ -9,47 +9,73 @@ public class IndentStringBuilder(string indentContent)
     public IndentStringBuilder(int indentLength = 4) : this(new string(' ', indentLength)) { }
 
     private readonly StringBuilder _builder = new();
-    private int _currentLevel;
-    private string _current = string.Empty;
+
+    public uint IndentLevel { get; private set; } = 0;
+    private string _indentString = string.Empty;
 
     private bool _currentLineIntended = false;
 
-    private void UpdateCurrent() =>
-        _current = string.Concat(Enumerable.Repeat(indentContent, _currentLevel));
+    private void UpdateIndent() =>
+        _indentString = string.Concat(Enumerable.Repeat(indentContent, (int)IndentLevel));
 
-    public IndentStringBuilder IncreaseIndent()
+    public IndentStringBuilder SetIndent(uint indent)
     {
-        _currentLevel++;
-        UpdateCurrent();
+        IndentLevel = indent;
+        UpdateIndent();
         return this;
     }
 
-    public IndentStringBuilder DecreaseIndent()
+    public IndentStringBuilder IncreaseIndent(uint indent = 1)
     {
-        _currentLevel--;
-        UpdateCurrent();
+        IndentLevel += indent;
+        UpdateIndent();
         return this;
     }
 
-    public readonly struct IndentDisposable(IndentStringBuilder builder) : IDisposable
+    public IndentStringBuilder DecreaseIndent(uint indent = 1)
+    {
+        IndentLevel -= indent;
+        UpdateIndent();
+        return this;
+    }
+
+    public readonly struct IndentDisposable(IndentStringBuilder builder, uint indent) : IDisposable
     {
         public void Dispose()
         {
-            builder.DecreaseIndent();
+            builder.DecreaseIndent(indent);
         }
     }
 
-    public IndentDisposable Indent()
+    public IndentDisposable Indent(uint indent = 1)
     {
-        IncreaseIndent();
-        return new(this);
+        IncreaseIndent(indent);
+        return new(this, indent);
     }
+
+    public readonly struct IndentWithDisposable(IndentStringBuilder builder, string append, uint indent) : IDisposable
+    {
+        public void Dispose()
+        {
+            builder.DecreaseIndent(indent);
+            builder.AppendLine(append);
+        }
+    }
+
+    public IndentWithDisposable IndentWith(string prepend, string append, uint indent = 1)
+    {
+        AppendLine(prepend);
+        IncreaseIndent(indent);
+        return new(this, append, indent);
+    }
+
+    public IndentWithDisposable IndentWithBrace(uint indent = 1) => IndentWith("{", "}", indent);
 
     public IndentStringBuilder Append(string content)
     {
         if (!_currentLineIntended)
         {
-            _builder.Append(_current);
+            _builder.Append(_indentString);
             _currentLineIntended = true;
         }
         _builder.Append(content);
@@ -59,7 +85,7 @@ public class IndentStringBuilder(string indentContent)
     public IndentStringBuilder AppendLine(string content)
     {
         if (!_currentLineIntended)
-            _builder.Append(_current);
+            _builder.Append(_indentString);
         _builder.AppendLine(content);
         _currentLineIntended = false;
         return this;
