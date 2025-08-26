@@ -8,7 +8,7 @@
 
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.2.3</Version>
+        <Version>0.3.0</Version>
         <Title>KirisameLib.Event</Title>
         <Authors>KirisameY</Authors>
         <PackageProjectUrl>https://github.com/KirisameY/KirisameLib</PackageProjectUrl>
@@ -27,7 +27,7 @@
 
     <!-- 包含分析器 -->
     <ItemGroup>
-        <None Include="../KirisameLib.Event.SourceGenerator/bin/Release/netstandard2.0/*.dll"
+        <None Include="../KirisameLib.Event.SourceGenerator/bin/Release/netstandard2.0/merged/*.dll"
               Pack="true" PackagePath="analyzers/dotnet/cs"/>
     </ItemGroup>
 

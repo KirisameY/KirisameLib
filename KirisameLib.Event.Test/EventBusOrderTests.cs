@@ -32,7 +32,7 @@ public class EventBusOrderTests
 
         bus.Publish(new SendEvent("Now I'm done"));
 
-        if (bus is DelayedEventBus delayedBus) delayedBus.HandleEvent();
+        if (bus is DelayedEventBus delayedBus) delayedBus.HandleEvent(); //todo: 炸了>_<
 
         string[] expected =
         [
