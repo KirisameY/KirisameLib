@@ -24,7 +24,7 @@ public class SyncTask<T> : SyncTask
         get => Status switch
         {
             SyncTaskStatus.RanToCompletion => field!,
-            SyncTaskStatus.Canceled        => throw new AggregateException(new OperationCanceledException(CancellationToken!.Value)),
+            SyncTaskStatus.Canceled        => throw new AggregateException(new SyncTaskCancelledException(this, CancellationToken!.Value)),
             SyncTaskStatus.Faulted         => throw new AggregateException(Exception!),
 
             _ => throw new InvalidOperationException("Unable to get result of an uncompleted SyncTask")

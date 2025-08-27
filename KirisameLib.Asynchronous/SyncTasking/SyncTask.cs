@@ -46,7 +46,7 @@ public partial class SyncTask
     {
         lock (Lock)
         {
-            if (Status is not SyncTaskStatus.Running) return;
+            if (Status is not (SyncTaskStatus.Created or SyncTaskStatus.Running)) return;
             Status            = SyncTaskStatus.Canceled;
             CancellationToken = token;
         }

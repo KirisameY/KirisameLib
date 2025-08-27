@@ -9,7 +9,7 @@ public readonly struct SyncTaskAwaiter(SyncTask task, bool restoreContext = true
     public void GetResult()
     {
         if (task.IsCompletedSuccessfully) return;
-        if (task.IsCanceled) throw new OperationCanceledException(task.CancellationToken!.Value);
+        if (task.IsCanceled) throw new SyncTaskCancelledException(task, task.CancellationToken!.Value);
         if (task.IsFaulted)
         {
             if (task.Exception!.InnerExceptions is [{ } e]) throw e;
@@ -50,7 +50,7 @@ public readonly struct SyncTaskAwaiter<T>(SyncTask<T> task, bool restoreContext 
     public T GetResult()
     {
         if (task.IsCompletedSuccessfully) return task.Result;
-        if (task.IsCanceled) throw new OperationCanceledException(task.CancellationToken!.Value);
+        if (task.IsCanceled) throw new SyncTaskCancelledException(task, task.CancellationToken!.Value);
         if (task.IsFaulted)
         {
             if (task.Exception!.InnerExceptions is [{ } e]) throw e;
