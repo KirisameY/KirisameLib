@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 
+using KirisameLib.Asynchronous.SyncTasking;
 using KirisameLib.Extensions;
 
 namespace KirisameLib.Event;
@@ -22,11 +23,11 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
     /// <returns>
     ///     Callback to remove registered handler, useful when unregistering an anonymous function
     /// </returns>
-    public Action SubscribeAsync<TEvent>(Func<TEvent, Task> handler, HandlerSubscribeFlag flags = HandlerSubscribeFlag.None)
+    public Action SubscribeAsync<TEvent>(Func<TEvent, SyncTask> handler, HandlerSubscribeFlag flags = HandlerSubscribeFlag.None)
         where TEvent : BaseEvent =>
         SubscribeHandler(handler, null, flags);
 
-    private Action SubscribeHandler<TEvent>(Func<TEvent, Task> handler, Action<TEvent>? source, HandlerSubscribeFlag flags) where TEvent : BaseEvent
+    private Action SubscribeHandler<TEvent>(Func<TEvent, SyncTask> handler, Action<TEvent>? source, HandlerSubscribeFlag flags) where TEvent : BaseEvent
     {
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
             _handlersDict[typeof(TEvent)] = handlerInfos = new();
@@ -47,7 +48,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
         handlerInfos.Handlers = handlerInfos.Handlers.RemoveAll(h => ReferenceEquals(h.source, handler));
     }
 
-    public void Unsubscribe<TEvent>(Func<TEvent, Task> handler)
+    public void Unsubscribe<TEvent>(Func<TEvent, SyncTask> handler)
         where TEvent : BaseEvent
     {
         if (!_handlersDict.TryGetValue(typeof(TEvent), out var handlerInfos))
@@ -60,7 +61,7 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
     private void EmitEvent<TEvent>(TEvent @event, Action? continueAction = null) where TEvent : BaseEvent
     {
         List<Exception> exceptions = [];
-        List<Task> tasks = [];
+        List<SyncTask> tasks = [];
 
         // 遍历Event类型基类直至BaseEvent(其基类是object)
         for (var type = typeof(TEvent); type != typeof(object); type = type!.BaseType)
@@ -76,12 +77,13 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
             {
                 try
                 {
-                    var handlerDelegate = (Func<TEvent, Task>)handler;
+                    var handlerDelegate = (Func<TEvent, SyncTask>)handler;
                     var result = handlerDelegate.Invoke(@event);
                     result.ContinueWith(t =>
                     {
+                        if (!t.IsFaulted) return;
                         exceptionHandler.Invoke(@event, t.Exception!.Flatten());
-                    }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current);
+                    });
                     tasks.Add(result);
                 }
                 catch (Exception e)
@@ -97,11 +99,11 @@ public abstract class EventBus(Action<BaseEvent, Exception> exceptionHandler)
             });
         }
 
-        Task.WhenAll(tasks).ContinueWith(_ =>
+        SyncTask.WhenAll(tasks).ContinueWith(_ =>
         {
             try { continueAction?.Invoke(); }
             catch (Exception e) { exceptionHandler.Invoke(@event, e); }
-        }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Current);
+        });
 
         if (exceptions.Count > 0) throw new EventSendingException(exceptions, @event);
     }

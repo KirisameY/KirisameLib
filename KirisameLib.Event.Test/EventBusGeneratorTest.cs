@@ -1,4 +1,6 @@
-﻿namespace KirisameLib.Event.Test;
+﻿using KirisameLib.Asynchronous.SyncTasking;
+
+namespace KirisameLib.Event.Test;
 
 public class EventBusGeneratorTest
 {
@@ -41,7 +43,7 @@ public class EventBusGeneratorTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(baseReceived,      Is.EquivalentTo(baseExpected));
+            Assert.That(baseReceived, Is.EquivalentTo(baseExpected));
             Assert.That(inheritedReceived, Is.EquivalentTo(inheritedExpected));
         });
     }
@@ -69,11 +71,12 @@ public partial class TestInheritedClass(string name, Action<string> handler) : T
     private readonly Action<string> _handler = handler;
 
     [EventHandler]
-    private void AnotherTestEventHandler(AnotherTestEvent e)
+    private SyncTask AnotherTestEventHandler(AnotherTestEvent e)
     {
         _handler.Invoke(e.Message);
         Console.Write($"{Name} - ");
         Console.WriteLine(e.Message);
+        return SyncTask.Completed();
     }
 
     [EventHandler(["testA"])]
