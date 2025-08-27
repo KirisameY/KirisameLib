@@ -52,10 +52,11 @@ public class SyncTask<T> : SyncTask
     public SyncTask ContinueWith(Action<SyncTask<T>> continuation, bool restoreContext = true)
     {
         SyncTask result = new();
+        var ctx = SynchronizationContext.Current;
         var action = () =>
         {
-            if (!restoreContext || SynchronizationContext.Current == Context || Context is null) RunContinue(this, continuation, result);
-            else Context.Post(_ => RunContinue(this, continuation, result), null);
+            if (!restoreContext || SynchronizationContext.Current == ctx || ctx is null) RunContinue(this, continuation, result);
+            else ctx.Post(_ => RunContinue(this, continuation, result), null);
         };
 
         var completed = false;
@@ -91,10 +92,11 @@ public class SyncTask<T> : SyncTask
     public SyncTask<TResult> ContinueWith<TResult>(Func<SyncTask<T>, TResult> continuation, bool restoreContext = true)
     {
         SyncTask<TResult> result = new();
+        var ctx = SynchronizationContext.Current;
         var action = () =>
         {
-            if (!restoreContext || SynchronizationContext.Current == Context || Context is null) RunContinue(this, continuation, result);
-            else Context.Post(_ => RunContinue(this, continuation, result), null);
+            if (!restoreContext || SynchronizationContext.Current == ctx || ctx is null) RunContinue(this, continuation, result);
+            else ctx.Post(_ => RunContinue(this, continuation, result), null);
         };
 
         var completed = false;

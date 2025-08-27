@@ -16,7 +16,6 @@ public partial class SyncTask
     public bool IsCanceled => Status is SyncTaskStatus.Canceled;
     public bool IsFaulted => Status is SyncTaskStatus.Faulted;
 
-    protected SynchronizationContext? Context;
     protected Action? Continuation;
 
     protected readonly Lock Lock = new();
@@ -27,8 +26,7 @@ public partial class SyncTask
         lock (Lock)
         {
             if (Status is not SyncTaskStatus.Created) return;
-            Context = SynchronizationContext.Current;
-            Status  = SyncTaskStatus.Running;
+            Status = SyncTaskStatus.Running;
         }
     }
 
@@ -74,10 +72,11 @@ public partial class SyncTask
     public SyncTask ContinueWith(Action continuation, bool restoreContext = true)
     {
         SyncTask result = new();
+        var ctx = SynchronizationContext.Current;
         var action = () =>
         {
-            if (!restoreContext || SynchronizationContext.Current == Context || Context is null) RunContinue(continuation, result);
-            else Context.Post(_ => RunContinue(continuation, result), null);
+            if (!restoreContext || SynchronizationContext.Current == ctx || ctx is null) RunContinue(continuation, result);
+            else ctx.Post(_ => RunContinue(continuation, result), null);
         };
 
         var completed = false;
@@ -108,10 +107,11 @@ public partial class SyncTask
     public SyncTask ContinueWith(Action<SyncTask> continuation, bool restoreContext = true)
     {
         SyncTask result = new();
+        var ctx = SynchronizationContext.Current;
         var action = () =>
         {
-            if (!restoreContext || SynchronizationContext.Current == Context || Context is null) RunContinue(this, continuation, result);
-            else Context.Post(_ => RunContinue(this, continuation, result), null);
+            if (!restoreContext || SynchronizationContext.Current == ctx || ctx is null) RunContinue(this, continuation, result);
+            else ctx.Post(_ => RunContinue(this, continuation, result), null);
         };
 
         var completed = false;
@@ -147,10 +147,11 @@ public partial class SyncTask
     public SyncTask<TResult> ContinueWith<TResult>(Func<SyncTask, TResult> continuation, bool restoreContext = true)
     {
         SyncTask<TResult> result = new();
+        var ctx = SynchronizationContext.Current;
         var action = () =>
         {
-            if (!restoreContext || SynchronizationContext.Current == Context || Context is null) RunContinue(this, continuation, result);
-            else Context.Post(_ => RunContinue(this, continuation, result), null);
+            if (!restoreContext || SynchronizationContext.Current == ctx || ctx is null) RunContinue(this, continuation, result);
+            else ctx.Post(_ => RunContinue(this, continuation, result), null);
         };
 
         var completed = false;
