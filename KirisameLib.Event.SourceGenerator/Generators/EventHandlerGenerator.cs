@@ -15,7 +15,8 @@ public class EventHandlerGenerator : IIncrementalGenerator
 {
     private static class Names
     {
-        public const string Task = "System.Threading.Tasks.Task";
+        //public const string Task = "System.Threading.Tasks.Task";
+        public const string SyncTask = "KirisameLib.Asynchronous.SyncTasking.SyncTask";
 
         public const string EventHandlerContainerAttribute = "KirisameLib.Event.EventHandlerContainerAttribute";
         public const string EventHandlerAttribute = "KirisameLib.Event.EventHandlerAttribute";
@@ -91,7 +92,7 @@ public class EventHandlerGenerator : IIncrementalGenerator
         foreach (var method in classSymbol.GetMembers().OfType<IMethodSymbol>())
         {
             if (method.IsOverride) continue;                                                        //do not consider inherited method
-            if (!method.ReturnsVoid && method.ReturnType.ToDisplayString() != Names.Task) continue; //should be void return type
+            if (!method.ReturnsVoid && method.ReturnType.ToDisplayString() != Names.SyncTask) continue; //should be void return type
             //should have single event parameter
             if (method.Parameters is not [{ Type: INamedTypeSymbol paramType }] || !paramType.IsDerivedFrom(Names.BaseEvent)) continue;
 

@@ -70,14 +70,15 @@ public partial class TestInheritedClass(string name, Action<string> handler) : T
 {
     private readonly Action<string> _handler = handler;
 
+    #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
     [EventHandler]
-    private SyncTask AnotherTestEventHandler(AnotherTestEvent e)
+    private async SyncTask AnotherTestEventHandler(AnotherTestEvent e)
     {
         _handler.Invoke(e.Message);
         Console.Write($"{Name} - ");
         Console.WriteLine(e.Message);
-        return SyncTask.Completed();
     }
+    #pragma warning restore CS1998
 
     [EventHandler(["testA"])]
     private void TestEventHandlerInAnotherGroup(TestEvent e)
