@@ -15,8 +15,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Logging", "KirisameLib.Logging\KirisameLib.Logging.csproj", "{307BB540-EDEA-4694-8866-0F75B4022F4F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Event", "KirisameLib.Event\KirisameLib.Event.csproj", "{2772649E-FC39-4446-894D-3168B965F4FA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D2E20117-5002-46EF-A770-BB56A5C04812} = {D2E20117-5002-46EF-A770-BB56A5C04812}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Event.Test", "KirisameLib.Event.Test\KirisameLib.Event.Test.csproj", "{81C137B0-FCD6-438B-9EDD-46BC64108813}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D2E20117-5002-46EF-A770-BB56A5C04812} = {D2E20117-5002-46EF-A770-BB56A5C04812}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirisameLib.Asynchronous", "KirisameLib.Asynchronous\KirisameLib.Asynchronous.csproj", "{137518DD-23DB-4377-A38E-C016C5953E90}"
 EndProject
